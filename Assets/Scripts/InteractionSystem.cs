@@ -3,7 +3,7 @@ using TMPro;
 
 public class InteractionSystem : MonoBehaviour
 {
-    public float interactionDistance = 2.5f;
+    public float interactionDistance = 1f;
     public GameObject promptUI; // Объект с текстом "E"
     public TextMeshProUGUI promptText;
     
