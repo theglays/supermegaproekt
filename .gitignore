@@ -1,11 +1,17 @@
-# Unity
-[Ll]ibrary/
-[Tt]emp/
-[Oo]bj/
-[Bb]uild/
-[Bb]uilds/
-[Ll]ogs/
-[Uu]ser[Ss]ettings/
-*.pidb
-*.log
-*.DS_Store
+# Авто-генерируемые файлы VS/Rider
+*.csproj
+*.sln
+*.userprefs
+*.unityproj
+
+# Папки с временными файлами
+/Library/
+/Temp/
+/Obj/
+/Build/
+/Builds/
+/Logs/
+
+# Настройки IDE
+.vs/
+.idea/
