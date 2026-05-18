@@ -8,10 +8,19 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: M_VFX_Fire_02
+<<<<<<< HEAD
   m_Shader: {fileID: 4800000, guid: b8a99704b1204314e816971e63a2a521, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 0
+=======
+  m_Shader: {fileID: 4800000, guid: 2ce4c95e7106985488f7f5bb730b3ae5, type: 3}
+  m_Parent: {fileID: 2100000, guid: 8ae06bec34c22884ba2acfa17c229c65, type: 2}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+>>>>>>> ce675489c51b6989c59d42245d0834a1ba4da2af
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -20,6 +29,7 @@ Material:
   disabledShaderPasses:
   - DistortionVectors
   - TransparentBackface
+<<<<<<< HEAD
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -35,26 +45,43 @@ Material:
         m_Texture: {fileID: 2800000, guid: cd946dcaa5face64fb135a09e293d277, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+=======
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _ColorGradientMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+>>>>>>> ce675489c51b6989c59d42245d0834a1ba4da2af
     - _Mask_Texture:
         m_Texture: {fileID: 2800000, guid: cd946dcaa5face64fb135a09e293d277, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+<<<<<<< HEAD
     - _NoiseDistortionTexture:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+=======
+>>>>>>> ce675489c51b6989c59d42245d0834a1ba4da2af
     - _NoiseDistortion_Texture:
         m_Texture: {fileID: 2800000, guid: 4c7b88daf72dcdb4d85c35517cee3224, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+<<<<<<< HEAD
     - _Noise_01_Texture:
         m_Texture: {fileID: 2800000, guid: f1b6b10620016be45b38159cac55e09b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+=======
+>>>>>>> ce675489c51b6989c59d42245d0834a1ba4da2af
     - _Noise_02_Texture:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+<<<<<<< HEAD
     - _Texture:
         m_Texture: {fileID: 2800000, guid: e98f402880ccea64fbeab50c8ad0b82a, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -72,11 +99,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_ShadowMasks:
+=======
+    - _TextureSample2:
+>>>>>>> ce675489c51b6989c59d42245d0834a1ba4da2af
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+<<<<<<< HEAD
     - _AddPrecomputedVelocity: 1
     - _AlphaCutoff: 0.5
     - _AlphaCutoffEnable: 0
@@ -186,3 +217,24 @@ Material:
     - _Noise_02_Scale: {r: 1, g: 1, b: 0, a: 0}
     - _Noise_02_Speed: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
+=======
+    - _DistortionAmount: 1
+    - _DistortionMask: 0
+    - _Emissive: 20
+    - _EmissiveIntensity: 1
+    - _Global_Speed: 1
+    - _NoisesOpacityBoost: 1
+    - _Noises_Multiply: 1
+    - _Opacity_Boost: 1
+    - _WindSpeed: 1
+    m_Colors:
+    - _ColorBottom: {r: 1, g: 0.36666667, b: 0, a: 0}
+    - _ColorTop: {r: 1, g: 0.6666667, b: 0, a: 0}
+    - _NoiseDistortion_Scale: {r: 2, g: 2, b: 0, a: 0}
+    - _NoiseDistortion_Speed: {r: 0, g: 0, b: 0, a: 0}
+    - _Noise_01_Scale: {r: 2, g: 2, b: 0, a: 0}
+    - _Noise_02_Scale: {r: 1, g: 1, b: 0, a: 0}
+    - _Noise_02_Speed: {r: 0, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
+>>>>>>> ce675489c51b6989c59d42245d0834a1ba4da2af
