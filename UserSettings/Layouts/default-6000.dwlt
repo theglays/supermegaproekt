@@ -118,7 +118,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 112}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 1
-  controlID: 16
+  controlID: 56
   draggingID: 0
 --- !u!114 &6
 MonoBehaviour:
@@ -145,7 +145,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 112}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 17
+  controlID: 57
   draggingID: 0
 --- !u!114 &7
 MonoBehaviour:
@@ -166,7 +166,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 703
+    width: 712
     height: 629
   m_MinSize: {x: 100, y: 112}
   m_MaxSize: {x: 8096, y: 16192}
@@ -190,8 +190,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 703
-    height: 573
+    width: 712
+    height: 463
   m_MinSize: {x: 201, y: 226}
   m_MaxSize: {x: 4001, y: 4026}
   m_ActualView: {fileID: 14}
@@ -217,11 +217,11 @@ MonoBehaviour:
   m_Position:
     serializedVersion: 2
     x: 0
-    y: 573
-    width: 703
-    height: 56
-  m_MinSize: {x: 100, y: 100}
-  m_MaxSize: {x: 4000, y: 4000}
+    y: 463
+    width: 712
+    height: 166
+  m_MinSize: {x: 101, y: 126}
+  m_MaxSize: {x: 4001, y: 4026}
   m_ActualView: {fileID: 17}
   m_Panes:
   - {fileID: 17}
@@ -237,23 +237,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: SceneHierarchyWindow
+  m_Name: ProjectBrowser
   m_EditorClassIdentifier: UnityEditor.dll::UnityEditor.DockArea
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 703
+    x: 712
     y: 0
-    width: 350
+    width: 554
     height: 629
-  m_MinSize: {x: 200, y: 200}
-  m_MaxSize: {x: 4000, y: 4000}
-  m_ActualView: {fileID: 18}
+  m_MinSize: {x: 232, y: 276}
+  m_MaxSize: {x: 10002, y: 10026}
+  m_ActualView: {fileID: 19}
   m_Panes:
   - {fileID: 18}
   - {fileID: 19}
-  m_Selected: 0
-  m_LastSelected: 1
+  m_Selected: 1
+  m_LastSelected: 0
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -269,12 +269,12 @@ MonoBehaviour:
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 1053
+    x: 1266
     y: 0
-    width: 313
+    width: 100
     height: 629
-  m_MinSize: {x: 275, y: 50}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 276, y: 76}
+  m_MaxSize: {x: 4001, y: 4026}
   m_ActualView: {fileID: 13}
   m_Panes:
   - {fileID: 13}
@@ -581,9 +581,9 @@ MonoBehaviour:
     m_TextWithWhitespace: "Inspector\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 1053
+    x: 1266
     y: 79
-    width: 312
+    width: 99
     height: 603
   m_SerializedDataModeController:
     m_DataMode: 0
@@ -634,8 +634,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 79
-    width: 702
-    height: 547
+    width: 711
+    height: 437
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0
@@ -1206,9 +1206,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: 0.42728123, y: 1.4467375, z: 14.293115}
+    m_Target: {x: 1171.3942, y: -445.51, z: 3271.374}
     speed: 2
-    m_Value: {x: 0.42728123, y: 1.4467375, z: 14.293115}
+    m_Value: {x: 1171.3942, y: -445.51, z: 3271.374}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1254,13 +1254,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.2869144, y: 0.0077363774, z: -0.0023943614, w: -0.95796835}
+    m_Target: {x: -0.3491834, y: 0.1292829, z: -0.048708066, w: -0.9268146}
     speed: 2
-    m_Value: {x: -0.28690493, y: 0.0062991367, z: -0.0019639, w: -0.9579363}
+    m_Value: {x: -0.34903553, y: 0.1320627, z: -0.049755372, w: -0.9264222}
   m_Size:
-    m_Target: 12.425417
+    m_Target: 1264.6948
     speed: 2
-    m_Value: 11.890351
+    m_Value: 1210.2343
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -1468,9 +1468,9 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 652
-    width: 702
-    height: 30
+    y: 542
+    width: 711
+    height: 140
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0
@@ -1524,21 +1524,18 @@ MonoBehaviour:
     m_DynamicPanelBehavior: 0
   m_SceneHierarchy:
     m_TreeViewState:
-      scrollPos: {x: 0, y: 58}
+      scrollPos: {x: 0, y: 0}
       m_SelectedIDs:
-      - m_Data: 45830
-      - m_Data: -8112
-      - m_Data: -22876
-      - m_Data: 46130
+      - m_Data: 45766
       m_LastClickedID:
-        m_Data: 46130
+        m_Data: 0
       m_ExpandedIDs:
-      - m_Data: -1296
-      - m_Data: 45762
-      - m_Data: 45870
-      - m_Data: 46030
-      - m_Data: 46092
-      - m_Data: 46122
+      - m_Data: -5324
+      - m_Data: -4660
+      - m_Data: -4494
+      - m_Data: -2568
+      - m_Data: -2378
+      - m_Data: -1322
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -1585,9 +1582,9 @@ MonoBehaviour:
     m_TextWithWhitespace: "Project\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 703
+    x: 712
     y: 79
-    width: 348
+    width: 552
     height: 603
   m_SerializedDataModeController:
     m_DataMode: 0
@@ -1613,7 +1610,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Settings
+    - Assets/Scenes
     m_Globs: []
     m_ProductIds: 
     m_AnyWithAssetOrigin: 0
@@ -1623,7 +1620,7 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Settings
+  - Assets/Scenes
   m_LastFoldersGridSize: -1
   m_LastProjectPath: C:\Users\Admin\Documents\GitHub\supermegaproekt
   m_LockTracker:
@@ -1632,20 +1629,19 @@ MonoBehaviour:
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs:
-    - m_Data: 49292
+    - m_Data: 46372
     m_LastClickedID:
-      m_Data: 49292
+      m_Data: 46372
     m_ExpandedIDs:
     - m_Data: 0
-    - m_Data: 49060
-    - m_Data: 49062
-    - m_Data: 49064
-    - m_Data: 49066
-    - m_Data: 49276
+    - m_Data: 46042
+    - m_Data: 46044
+    - m_Data: 46046
+    - m_Data: 46048
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
+      m_Name: Scenes
+      m_OriginalName: Scenes
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
@@ -1653,10 +1649,10 @@ MonoBehaviour:
         width: 0
         height: 0
       m_UserData:
-        m_Data: 0
+        m_Data: 46372
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 11
+      m_OriginalEventType: 0
       m_IsRenamingFilename: 1
       m_TrimLeadingAndTrailingWhitespace: 0
       m_ClientGUIView: {fileID: 10}
@@ -1674,10 +1670,10 @@ MonoBehaviour:
       m_Data: 0
     m_ExpandedIDs:
     - m_Data: 0
-    - m_Data: 49060
-    - m_Data: 49062
-    - m_Data: 49064
-    - m_Data: 49066
+    - m_Data: 46042
+    - m_Data: 46044
+    - m_Data: 46046
+    - m_Data: 46048
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1705,8 +1701,8 @@ MonoBehaviour:
       m_ResourceFile: 
   m_ListAreaState:
     m_SelectedInstanceIDs:
-    - m_Data: 784
-    m_LastClickedInstanceID: 784
+    - m_Data: 46388
+    m_LastClickedInstanceID: 46388
     m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs:
     - m_Data: 57994
@@ -1739,7 +1735,7 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
     m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 116}
+    m_ScrollPosition: {x: 0, y: 0}
     m_GridSize: 64
   m_SkipHiddenPackages: 0
-  m_DirectoriesAreaWidth: 195
+  m_DirectoriesAreaWidth: 166
