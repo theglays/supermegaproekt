@@ -1,4 +1,26 @@
 ﻿<Solution>
+<<<<<<< HEAD
+=======
+  <Project Path="Unity.RenderPipelines.GPUDriven.Runtime.csproj" />
+  <Project Path="Unity.ShaderGraph.Editor.csproj" />
+  <Project Path="Unity.RenderPipelines.Core.Runtime.csproj" />
+  <Project Path="Unity.Multiplayer.Center.Editor.csproj" />
+  <Project Path="Unity.RenderPipelines.Core.Editor.csproj" />
+  <Project Path="UnityEngine.UI.csproj" />
+  <Project Path="Unity.RenderPipelines.Universal.2D.Runtime.csproj" />
+  <Project Path="Unity.RenderPipelines.Universal.Editor.csproj" />
+  <Project Path="UnityEngine.TestRunner.csproj" />
+  <Project Path="PPv2URPConverters.csproj" />
+  <Project Path="UnityEditor.TestRunner.csproj" />
+  <Project Path="Unity.RenderPipelines.Universal.Runtime.csproj" />
+  <Project Path="Unity.UnifiedRayTracing.Runtime.csproj" />
+  <Project Path="Unity.TextMeshPro.csproj" />
+  <Project Path="Unity.TextMeshPro.Editor.csproj" />
+  <Project Path="UnityEditor.UI.csproj" />
+  <Project Path="Unity.RenderPipelines.Universal.2D.Editor.Overrides.csproj" />
+  <Project Path="Unity.2D.Sprite.Editor.csproj" />
+  <Project Path="Unity.Multiplayer.Center.Common.csproj" />
+>>>>>>> 00e86bb6b693693557fdecf18c25d3f47f915a89
   <Project Path="Assembly-CSharp.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
 </Solution>
