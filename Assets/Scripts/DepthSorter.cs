@@ -1,31 +1,33 @@
 using UnityEngine;
 
-[RequireComponent(typeof(SpriteRenderer))]
+[RequireComponent(typeof(Renderer))]
 public class DepthSorter : MonoBehaviour
 {
-    private SpriteRenderer sr;
-    private Camera cam;
+    [Tooltip("Множитель сортировки. 100 обычно хватает. Если объекты мерцают, увеличь до 200-500.")]
+    public float sortMultiplier = 100f;
 
-    [Tooltip("Если сортировка работает наоборот, поставь галочку")]
-    public bool invertOrder = false;
+    [Tooltip("Базовое смещение. Помогает, если нужно поднять/опустить весь объект в очереди отрисовки.")]
+    public int baseOffset = 0;
+
+    private Renderer rend;
 
     void Awake()
     {
-        sr = GetComponent<SpriteRenderer>();
-        cam = Camera.main ?? FindObjectOfType<Camera>();
+        rend = GetComponent<Renderer>();
+        // Принудительно ставим все объекты на один слой сортировки.
+        // Если у тебя свой слой, замени "Default" на его название.
+        rend.sortingLayerName = "Default";
     }
 
     void LateUpdate()
     {
-        if (cam == null) return;
-
-        // Вектор от камеры к объекту
-        Vector3 toObject = transform.position - cam.transform.position;
-        // Проекция на направление взгляда камеры = точная глубина
-        float depth = Vector3.Dot(toObject, cam.transform.forward);
-
-        // Чем больше depth (ближе к камере), тем выше sortingOrder
-        int order = Mathf.RoundToInt(depth * 100f);
-        sr.sortingOrder = invertOrder ? -order : order;
+        // Чем дальше объект по Z (дальше от камеры), тем МЕНЬШЕ его порядок.
+        // Минус гарантирует, что ближние объекты всегда рисуются поверх дальних.
+        int order = Mathf.RoundToInt(-transform.position.z * sortMultiplier) + baseOffset;
+        
+        // Защита от переполнения и слипания
+        order = Mathf.Clamp(order, -10000, 10000);
+        
+        rend.sortingOrder = order;
     }
 }

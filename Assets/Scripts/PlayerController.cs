@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     public LayerMask obstacleLayer;       // Слой препятствий
     public float checkRadius = 0.4f;      // Радиус проверки столкновений
     public float stopDistance = 0.05f;    // Дистанция остановки от препятствия
+    public Vector3 checkOffset = new Vector3(0, -0.5f, 0); // СМЕЩЕНИЕ ДЛЯ НОГ (настройте в инспекторе)
 
     [Header("Спрайты: Стоя")]
     public Sprite idleLeft;
@@ -33,7 +34,6 @@ public class PlayerController : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         targetPosition = transform.position;
         
-        // Если слой не назначен в инспекторе, ищем по имени
         if (obstacleLayer == 0)
         {
             obstacleLayer = LayerMask.GetMask("Obstacles");
@@ -50,7 +50,6 @@ public class PlayerController : MonoBehaviour
             Vector3 direction = targetPosition - transform.position;
             direction.y = 0;
 
-            // Определяем направление взгляда
             if (Mathf.Abs(direction.x) > 0.2f)
             {
                 bool newFacing = direction.x > 0;
@@ -62,7 +61,6 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            // Рассчитываем следующий шаг
             float step = moveSpeed * Time.deltaTime;
             Vector3 newPosition = Vector3.MoveTowards(transform.position, targetPosition, step);
             
@@ -73,20 +71,17 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                // Если путь заблокирован, пробуем обойти (опционально)
                 if (CanMoveAround(newPosition))
                 {
                     transform.position = newPosition;
                 }
                 else
                 {
-                    // Останавливаем движение к цели
                     hasTarget = false;
                     isMoving = false;
                 }
             }
 
-            // Проверяем, достигли ли цели
             if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
             {
                 hasTarget = false;
@@ -109,12 +104,14 @@ public class PlayerController : MonoBehaviour
     // Проверка, заблокирован ли путь
     bool IsPathBlocked(Vector3 newPosition)
     {
-        // Проверяем коллизию в новой позиции
-        Collider[] hitColliders = Physics.OverlapSphere(newPosition, checkRadius, obstacleLayer);
+        // Смещаем точку проверки на уровень ног
+        Vector3 checkPoint = newPosition + checkOffset;
+
+        // Проверяем коллизию в смещенной позиции
+        Collider[] hitColliders = Physics.OverlapSphere(checkPoint, checkRadius, obstacleLayer);
         
         foreach (Collider collider in hitColliders)
         {
-            // Игнорируем самого игрока (если есть коллайдер)
             if (collider.gameObject != gameObject)
             {
                 return true; // Путь заблокирован
@@ -123,14 +120,11 @@ public class PlayerController : MonoBehaviour
         return false; // Путь свободен
     }
 
-    // Простая попытка "обойти" препятствие (движение по касательной)
     bool CanMoveAround(Vector3 desiredPosition)
     {
-        // Если расстояние до цели очень маленькое - не пытаемся обойти
         if (Vector3.Distance(transform.position, targetPosition) < stopDistance)
             return false;
             
-        // Пробуем движение вверх/вниз по Z (для 3D)
         Vector3 sidestepPosition = new Vector3(
             desiredPosition.x,
             desiredPosition.y,
@@ -186,7 +180,6 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 newTarget = new Vector3(point.x, transform.position.y, point.z);
         
-        // Проверяем, не кликнули ли за препятствием
         if (!IsTargetBehindWall(newTarget))
         {
             targetPosition = newTarget;
@@ -195,23 +188,25 @@ public class PlayerController : MonoBehaviour
         }
     }
     
-    // Проверка, можно ли кликнуть в точку (луч от игрока до цели)
     bool IsTargetBehindWall(Vector3 target)
     {
-        Vector3 direction = target - transform.position;
+        // Пускаем луч тоже от уровня ног, чтобы он не перелетал через низкие препятствия
+        Vector3 startPoint = transform.position + checkOffset;
+        Vector3 targetPoint = target + checkOffset;
+
+        Vector3 direction = targetPoint - startPoint;
         float distance = direction.magnitude;
         
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, direction.normalized, out hit, distance, obstacleLayer))
+        if (Physics.Raycast(startPoint, direction.normalized, out hit, distance, obstacleLayer))
         {
-            // Если луч упёрся в препятствие раньше, чем дошёл до цели
             if (hit.collider.gameObject != gameObject)
             {
                 Debug.Log("Цель за препятствием: " + hit.collider.name);
-                return true; // Цель за стеной
+                return true; 
             }
         }
-        return false; // Цель достижима
+        return false; 
     }
 
     public Vector3 GetPosition() => transform.position;
@@ -221,13 +216,14 @@ public class PlayerController : MonoBehaviour
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, checkRadius);
+        // Отрисовка сферы с учетом смещения для ног
+        Gizmos.DrawWireSphere(transform.position + checkOffset, checkRadius);
         
         if (hasTarget)
         {
             Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(targetPosition, 0.2f);
-            Gizmos.DrawLine(transform.position, targetPosition);
+            Gizmos.DrawWireSphere(targetPosition + checkOffset, 0.2f);
+            Gizmos.DrawLine(transform.position + checkOffset, targetPosition + checkOffset);
         }
     }
 }

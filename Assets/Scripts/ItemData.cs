@@ -1,9 +1,11 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Item Data", menuName = "Interaction/Item Data")]
+[CreateAssetMenu(fileName = "NewItemData", menuName = "ScriptableObjects/ItemData")]
 public class ItemData : ScriptableObject
 {
-    public string itemName; // Название объекта
+    [Header("Настройки предмета")]
+    public string itemName;                  // Имя предмета (например, "Карточный стол")
+    
     [TextArea(3, 10)]
-    public string interactionDescription; // Текст, который появится на Canvas
+    public string interactionDescription;    // Атмосферное описание про Петербург или штосс
 }
