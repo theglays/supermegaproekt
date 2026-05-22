@@ -1,0 +1,11 @@
+# Бинарные файлы (не нужно менять переводы строк)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.tga binary
+*.tif binary
+*.fbx binary
+*.obj binary
+*.wav binary
+*.mp3 binary
+*.unitypackage binary

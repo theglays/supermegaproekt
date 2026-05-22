@@ -1,0 +1,17 @@
+# Авто-генерируемые файлы VS/Rider
+*.csproj
+*.sln
+*.userprefs
+*.unityproj
+
+# Папки с временными файлами
+/Library/
+/Temp/
+/Obj/
+/Build/
+/Builds/
+/Logs/
+
+# Настройки IDE
+.vs/
+.idea/
