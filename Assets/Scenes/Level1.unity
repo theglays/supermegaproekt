@@ -6431,12 +6431,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
   sfxPoolSize: 10
   sounds:
-  - name: 
-    clip: {fileID: 0}
-    volume: 0
-    pitch: 0
+  - name: Shagi
+    clip: {fileID: 8300000, guid: 3ac79df2723017c4c8cf36284ed69b04, type: 3}
+    volume: 0.78
+    pitch: 1
     loop: 0
-    is3D: 0
+    is3D: 1
     source: {fileID: 0}
   - name: 
     clip: {fileID: 0}
