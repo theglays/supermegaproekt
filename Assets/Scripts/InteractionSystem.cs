@@ -57,15 +57,29 @@ public class InteractionSystem : MonoBehaviour
     }
 
     void Interact()
+{
+    InteractableObject interactable = currentInteractable.GetComponent<InteractableObject>();
+    if (interactable != null && interactable.data != null)
     {
-        InteractableObject interactable = currentInteractable.GetComponent<InteractableObject>();
-        if (interactable != null && interactable.data != null)
+        // 🔥 ОТЛАДКА + ЗВУК 🔥
+        string debugSound = interactable.data.customSoundName;
+        Debug.Log($"[DEBUG] Предмет: {interactable.data.itemName} | CustomSound: '{debugSound}' | Пустой?: {string.IsNullOrEmpty(debugSound)}");
+
+        if (AudioManager.Instance != null)
         {
-            // Останавливаем текущую анимацию, если она идет, чтобы начать новую
-            StopAllCoroutines();
-            StartCoroutine(FadeDescription(interactable.data.interactionDescription));
+            string soundName = !string.IsNullOrEmpty(debugSound) ? debugSound : "Interact";
+            Debug.Log($"[DEBUG] Запрашиваем звук: '{soundName}'");
+            AudioManager.Instance.PlaySFX(soundName, currentInteractable.position);
         }
+
+        StopAllCoroutines();
+        StartCoroutine(FadeDescription(interactable.data.interactionDescription));
     }
+    else
+    {
+        Debug.LogWarning("[Interact] У объекта нет компонента InteractableObject или не назначен ItemData!");
+    }
+}
 
     IEnumerator FadeDescription(string message)
     {

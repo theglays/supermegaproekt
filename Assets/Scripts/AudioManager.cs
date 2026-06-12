@@ -166,4 +166,19 @@ public class AudioManager : MonoBehaviour
             if (t != null) activeMusicSource.volume = t.volume * musicVolume;
         }
     }
+
+    // 👇 👇 👇  НОВЫЙ МЕТОД (ДОБАВЬ ЕГО В САМЫЙ НИЗ, ПЕРЕД ПОСЛЕДНЕЙ } ) 👇 👇 👇
+    
+    /// <summary>
+    /// Возвращает имя клипа, который сейчас играет в активном источнике музыки.
+    /// Нужно для того, чтобы LevelMusicController не перезапускал тот же трек.
+    /// </summary>
+    public string GetActiveMusicClipName()
+    {
+        if (activeMusicSource != null && activeMusicSource.clip != null)
+            return activeMusicSource.clip.name;
+        return null;
+    }
+    
+    // 👆 👆 👆  КОНЕЦ НОВОГО МЕТОДА  👆 👆 👆
 }

@@ -8,13 +8,14 @@ public class PlayerController : MonoBehaviour
     private Vector3 targetPosition;
     private bool hasTarget = false;
     private bool isMoving = false;
+    private bool wasMoving = false;  // 👈 ДОБАВЛЕНО: для отслеживания начала движения
     private bool isFacingRight = true;
     
     [Header("Raycast настройки (препятствия)")]
-    public LayerMask obstacleLayer;       // Слой препятствий
-    public float checkRadius = 0.4f;      // Радиус проверки столкновений
-    public float stopDistance = 0.05f;    // Дистанция остановки от препятствия
-    public Vector3 checkOffset = new Vector3(0, -0.5f, 0); // СМЕЩЕНИЕ ДЛЯ НОГ (настройте в инспекторе)
+    public LayerMask obstacleLayer;
+    public float checkRadius = 0.4f;
+    public float stopDistance = 0.05f;
+    public Vector3 checkOffset = new Vector3(0, -0.5f, 0);
 
     [Header("Спрайты: Стоя")]
     public Sprite idleLeft;
@@ -27,6 +28,7 @@ public class PlayerController : MonoBehaviour
     private SpriteRenderer sr;
     private int walkFrame = 0;
     private float animTimer = 0f;
+    private int stepCounter = 0;  // 👈 ДОБАВЬ ЭТУ СТРОКУ
     private float animSpeed = 0.15f;
 
     void Start()
@@ -97,6 +99,24 @@ public class PlayerController : MonoBehaviour
             isMoving = false;
         }
 
+// // 🔥 РИТМИЧНЫЕ ШАГИ: звук каждые 4 кадра анимации 🔥
+// if (AudioManager.Instance != null && isMoving)
+// {
+//     animTimer += Time.deltaTime;
+//     if (animTimer >= animSpeed)
+//     {
+//         animTimer = 0f;
+//         walkFrame = (walkFrame + 1) % currentWalk.Count;
+//         sr.sprite = currentWalk[walkFrame];
+        
+//         // Счётчик шагов: проигрываем звук только каждый 4-й кадр
+//         stepCounter++;
+//         if (stepCounter % 4 == 0)
+//         {
+//             AudioManager.Instance.PlaySFX("Footstep", transform.position);
+//         }
+//     }
+// }
         // 2. Анимация
         UpdateSprite();
     }
@@ -104,20 +124,17 @@ public class PlayerController : MonoBehaviour
     // Проверка, заблокирован ли путь
     bool IsPathBlocked(Vector3 newPosition)
     {
-        // Смещаем точку проверки на уровень ног
         Vector3 checkPoint = newPosition + checkOffset;
-
-        // Проверяем коллизию в смещенной позиции
         Collider[] hitColliders = Physics.OverlapSphere(checkPoint, checkRadius, obstacleLayer);
         
         foreach (Collider collider in hitColliders)
         {
             if (collider.gameObject != gameObject)
             {
-                return true; // Путь заблокирован
+                return true;
             }
         }
-        return false; // Путь свободен
+        return false;
     }
 
     bool CanMoveAround(Vector3 desiredPosition)
@@ -153,28 +170,39 @@ public class PlayerController : MonoBehaviour
     }
 
     void UpdateSprite()
-    {
-        Sprite currentIdle = isFacingRight ? idleRight : idleLeft;
-        List<Sprite> currentWalk = isFacingRight ? walkSpritesRight : walkSpritesLeft;
+{
+    Sprite currentIdle = isFacingRight ? idleRight : idleLeft;
+    List<Sprite> currentWalk = isFacingRight ? walkSpritesRight : walkSpritesLeft;
 
-        if (!isMoving)
+    if (!isMoving)
+    {
+        if (sr.sprite != currentIdle)
+            sr.sprite = currentIdle;
+        animTimer = 0f;
+        walkFrame = 0;
+        stepCounter = 0; // Сбрасываем счётчик при остановке
+    }
+    else
+    {
+        animTimer += Time.deltaTime;
+        if (animTimer >= animSpeed)
         {
-            if (sr.sprite != currentIdle)
-                sr.sprite = currentIdle;
             animTimer = 0f;
-            walkFrame = 0;
-        }
-        else
-        {
-            animTimer += Time.deltaTime;
-            if (animTimer >= animSpeed)
+            walkFrame = (walkFrame + 1) % currentWalk.Count;
+            sr.sprite = currentWalk[walkFrame];
+            
+            // 🔥 Звук каждые 4 кадра 🔥
+            if (AudioManager.Instance != null)
             {
-                animTimer = 0f;
-                walkFrame = (walkFrame + 1) % currentWalk.Count;
-                sr.sprite = currentWalk[walkFrame];
+                stepCounter++;
+                if (stepCounter % 4 == 0)
+                {
+                    AudioManager.Instance.PlaySFX("Footstep", transform.position);
+                }
             }
         }
     }
+}
 
     public void SetTarget(Vector3 point)
     {
@@ -190,7 +218,6 @@ public class PlayerController : MonoBehaviour
     
     bool IsTargetBehindWall(Vector3 target)
     {
-        // Пускаем луч тоже от уровня ног, чтобы он не перелетал через низкие препятствия
         Vector3 startPoint = transform.position + checkOffset;
         Vector3 targetPoint = target + checkOffset;
 
@@ -212,11 +239,9 @@ public class PlayerController : MonoBehaviour
     public Vector3 GetPosition() => transform.position;
     public bool IsMoving() => isMoving;
     
-    // Визуализация радиуса проверки в редакторе (для отладки)
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        // Отрисовка сферы с учетом смещения для ног
         Gizmos.DrawWireSphere(transform.position + checkOffset, checkRadius);
         
         if (hasTarget)

@@ -8,4 +8,7 @@ public class ItemData : ScriptableObject
     
     [TextArea(3, 10)]
     public string interactionDescription;    // Атмосферное описание про Петербург или штосс
+    
+    [Tooltip("Имя звука для этого предмета (как в AudioManager). Оставь пустым для стандартного 'Interact'")]
+public string customSoundName;
 }

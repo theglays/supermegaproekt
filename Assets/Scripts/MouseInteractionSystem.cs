@@ -53,14 +53,28 @@ public class MouseInteractionSystem : MonoBehaviour
                 }
 
                 // Клик ЛКМ
-                if (Input.GetMouseButtonDown(0)) 
-                {
-                    if (interactable.data != null)
-                    {
-                        StopAllCoroutines();
-                        StartCoroutine(FadeDescription(interactable.data.interactionDescription));
-                    }
-                }
+if (Input.GetMouseButtonDown(0)) 
+{
+  if (interactable.data != null)
+{
+    // 🔥 ОТЛАДКА: смотрим, что читается из данных 🔥
+    string debugSound = interactable.data.customSoundName;
+    Debug.Log($"[DEBUG] Предмет: {interactable.data.itemName} | CustomSound: '{debugSound}' | Пустой?: {string.IsNullOrEmpty(debugSound)}");
+
+    if (AudioManager.Instance != null)
+    {
+        string soundName = !string.IsNullOrEmpty(debugSound) 
+            ? debugSound 
+            : "Interact";
+        
+        Debug.Log($"[DEBUG] Запрашиваем звук: '{soundName}'");
+        AudioManager.Instance.PlaySFX(soundName, hit.point);
+    }
+    
+    StopAllCoroutines();
+    StartCoroutine(FadeDescription(interactable.data.interactionDescription));
+}
+}
                 return;
             }
         }
