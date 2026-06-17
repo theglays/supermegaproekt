@@ -24,28 +24,47 @@ public class JournalUI : MonoBehaviour
 
     [Header("Анимация выезда")]
     public float slideSpeed = 8f;
-    [Tooltip("Позиция книги 'за экраном' (левее видимой области)")]
-    public Vector2 hiddenPos = new Vector2(-900, 0);
-    [Tooltip("Позиция книги 'на экране'")]
-    public Vector2 visiblePos = new Vector2(50, 0);
+    
+    // Полностью за левым краем экрана (ширина референса 1920 + запас)
+public Vector2 hiddenPos = new Vector2(-6000, 0);
+    
+    // Строго по центру экрана
+    public Vector2 visiblePos = new Vector2(0, 0);
 
     private bool isOpen = false;
     private bool isAnimating = false;
     private RectTransform panelRect;
 
-    void Awake()
+     void Awake()
+{
+    panelRect = journalPanel.GetComponent<RectTransform>();
+    if (panelRect == null)
     {
-        panelRect = journalPanel.GetComponent<RectTransform>();
-        if (panelRect == null)
-        {
-            Debug.LogError("[JournalUI] journalPanel должен иметь RectTransform!");
-            return;
-        }
-
-        // Устанавливаем начальную позицию за экраном
-        panelRect.anchoredPosition = hiddenPos;
-        journalPanel.SetActive(true); // Активируем, но оставляем скрытым визуально
+        Debug.LogError("[JournalUI] journalPanel должен иметь RectTransform!");
+        return;
     }
+
+    // Принудительно сбрасываем якоря к центру
+    panelRect.anchorMin = new Vector2(0.5f, 0.5f);
+    panelRect.anchorMax = new Vector2(0.5f, 0.5f);
+    panelRect.pivot = new Vector2(0.5f, 0.5f);
+    
+    // Устанавливаем начальную позицию
+    panelRect.anchoredPosition = hiddenPos;
+    
+    Debug.Log($"[JournalUI] Инициализация завершена. Позиция: {panelRect.anchoredPosition}");
+    
+    journalPanel.SetActive(true);
+}
+void Start()
+{
+    // Повторяем установку в Start на случай, если Awake не сработал
+    if (panelRect != null)
+    {
+        panelRect.anchoredPosition = hiddenPos;
+        Debug.Log($"[JournalUI] Start: позиция установлена на {panelRect.anchoredPosition}");
+    }
+}
 
     void Update()
     {
@@ -65,17 +84,14 @@ public class JournalUI : MonoBehaviour
     }
 
     /// <summary> Открыть/закрыть дневник </summary>
-    public void ToggleJournal()
+     public void ToggleJournal()
     {
         if (isAnimating) return;
         
         isOpen = !isOpen;
         isAnimating = true;
 
-        if (isOpen)
-        {
-            Refresh(); // Обновляем контент при открытии
-        }
+        if (isOpen) Refresh();
     }
 
     /// <summary> Переключить вкладку </summary>
