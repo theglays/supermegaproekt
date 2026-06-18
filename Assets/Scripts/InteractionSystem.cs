@@ -8,13 +8,13 @@ public class InteractionSystem : MonoBehaviour
     public float interactionDistance = 2f;
 
     [Header("Ссылки на UI")]
-    public GameObject promptE;           // Объект с буквой "E"
-    public CanvasGroup descriptionGroup; // Canvas Group текста описания
-    public TextMeshProUGUI infoText;     // Сам текст
+    public GameObject promptE;
+    public CanvasGroup descriptionGroup;
+    public TextMeshProUGUI infoText;
 
     [Header("Настройки анимации")]
-    public float fadeSpeed = 2f;         // Скорость появления/исчезновения
-    public float displayDuration = 3f;   // Сколько текст висит полностью видимым
+    public float fadeSpeed = 2f;
+    public float displayDuration = 3f;
 
     private Transform currentInteractable = null;
     private bool isDescriptionActive = false;
@@ -23,7 +23,6 @@ public class InteractionSystem : MonoBehaviour
     {
         FindNearest();
 
-        // Буква E видна только если мы рядом И описание не проигрывается
         if (currentInteractable != null && !isDescriptionActive)
         {
             promptE.SetActive(true);
@@ -57,36 +56,24 @@ public class InteractionSystem : MonoBehaviour
     }
 
     void Interact()
-{
-    InteractableObject interactable = currentInteractable.GetComponent<InteractableObject>();
-    if (interactable != null && interactable.data != null)
     {
-        // 🔥 ОТЛАДКА + ЗВУК 🔥
-        string debugSound = interactable.data.customSoundName;
-        Debug.Log($"[DEBUG] Предмет: {interactable.data.itemName} | CustomSound: '{debugSound}' | Пустой?: {string.IsNullOrEmpty(debugSound)}");
-
-        if (AudioManager.Instance != null)
+        InteractableObject interactable = currentInteractable.GetComponent<InteractableObject>();
+        if (interactable != null && interactable.data != null)
         {
-            string soundName = !string.IsNullOrEmpty(debugSound) ? debugSound : "Interact";
-            Debug.Log($"[DEBUG] Запрашиваем звук: '{soundName}'");
-            AudioManager.Instance.PlaySFX(soundName, currentInteractable.position);
+            StopAllCoroutines();
+            StartCoroutine(FadeDescription(interactable.data));
+            
+            // 🔥 ДОБАВЛЯЕМ ЗАПИСЬ В ДНЕВНИК 🔥
+            AddToJournal(interactable.data);
         }
-
-        StopAllCoroutines();
-        StartCoroutine(FadeDescription(interactable.data.interactionDescription));
     }
-    else
-    {
-        Debug.LogWarning("[Interact] У объекта нет компонента InteractableObject или не назначен ItemData!");
-    }
-}
 
-    IEnumerator FadeDescription(string message)
+    IEnumerator FadeDescription(ItemData data)
     {
         isDescriptionActive = true;
-        infoText.text = message;
+        infoText.text = data.interactionDescription;
 
-        // 1. Плавное появление (Alpha 0 -> 1)
+        // Плавное появление
         float t = 0;
         while (t < 1f)
         {
@@ -96,10 +83,10 @@ public class InteractionSystem : MonoBehaviour
         }
         descriptionGroup.alpha = 1f;
 
-        // 2. Ожидание
+        // Ожидание
         yield return new WaitForSeconds(displayDuration);
 
-        // 3. Плавное исчезновение (Alpha 1 -> 0)
+        // Плавное исчезновение
         t = 0;
         while (t < 1f)
         {
@@ -110,5 +97,48 @@ public class InteractionSystem : MonoBehaviour
         descriptionGroup.alpha = 0f;
 
         isDescriptionActive = false;
+    }
+
+    // 🔥 НОВЫЙ МЕТОД: Добавление записи в дневник 🔥
+    void AddToJournal(ItemData data)
+    {
+        // Проверяем, есть ли данные для дневника
+        if (string.IsNullOrEmpty(data.journalEntryId))
+        {
+            Debug.Log($"[Journal] У предмета '{data.itemName}' нет journalEntryId, пропускаем");
+            return;
+        }
+
+        if (SaveManager.Instance == null)
+        {
+            Debug.LogWarning("[Journal] SaveManager не найден!");
+            return;
+        }
+
+        // Создаём запись
+        JournalEntry entry = new JournalEntry(
+            id: data.journalEntryId,
+            title: !string.IsNullOrEmpty(data.journalTitle) ? data.journalTitle : data.itemName,
+            content: !string.IsNullOrEmpty(data.journalContent) ? data.journalContent : data.interactionDescription,
+            portrait: data.portraitSprite,
+            isNpc: data.isNpcEntry
+        );
+
+        // Пытаемся добавить (вернёт false, если уже есть)
+        bool wasAdded = SaveManager.Instance.UnlockEntry(entry);
+
+        if (wasAdded)
+        {
+            Debug.Log($"[Journal] ✅ Новая запись добавлена: {entry.title}");
+            
+            // Если дневник открыт — обновляем его сразу
+            JournalUI jui = FindObjectOfType<JournalUI>();
+            if (jui != null && jui.gameObject.activeSelf)
+                jui.Refresh();
+        }
+        else
+        {
+            Debug.Log($"[Journal] Запись '{entry.title}' уже существует, пропускаем");
+        }
     }
 }
