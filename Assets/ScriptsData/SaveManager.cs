@@ -85,16 +85,35 @@ public class SaveManager : MonoBehaviour
     }
 
     // 🔥 Удалить сохранение (для кнопки "Новая игра") 🔥
-    public void DeleteSave()
+   // 🔥 Удалить сохранение (для кнопки "Новая игра") 🔥
+public void DeleteSave()
+{
+    if (File.Exists(savePath))
     {
-        if (File.Exists(savePath))
-        {
-            File.Delete(savePath);
-            currentSave = new SaveData();
-            Debug.Log("[Save] Сохранение удалено");
-        }
+        File.Delete(savePath);
+        currentSave = new SaveData();
+        Debug.Log("[Save] Сохранение удалено");
     }
+    else
+    {
+        Debug.Log("[Save] Файл сохранения не найден");
+    }
+}
 
+// 🔥 НОВЫЙ МЕТОД: Начать новую игру 🔥
+public void StartNewGame()
+{
+    Debug.Log("[Save] Начинаем новую игру...");
+    
+    // Удаляем старое сохранение
+    DeleteSave();
+    
+    // Перезагружаем текущую сцену
+    string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+    UnityEngine.SceneManagement.SceneManager.LoadScene(currentScene);
+    
+    Debug.Log("[Save] Игра перезапущена");
+}
     // 🔥 Обновить позицию игрока (вызывать при выходе из уровня) 🔥
     public void UpdatePlayerPosition(Vector3 pos, string sceneName)
     {

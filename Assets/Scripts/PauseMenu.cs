@@ -82,4 +82,19 @@ public class PauseMenu : MonoBehaviour
             Application.Quit();
         #endif
     }
+    public void OnNewGameButton()
+    {
+        // Сначала возобновляем время, чтобы сцена загрузилась нормально
+        Time.timeScale = 1f; 
+
+        if (SaveManager.Instance != null)
+        {
+            SaveManager.Instance.StartNewGame();
+        }
+        else
+        {
+            // Если SaveManager по какой-то причине не найден, просто перезагружаем сцену
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+    }
 }

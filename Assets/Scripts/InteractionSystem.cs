@@ -25,6 +25,14 @@ public class InteractionSystem : MonoBehaviour
 
         if (currentInteractable != null && !isDescriptionActive)
         {
+            // 🔥 Проверяем, активен ли объект 🔥
+            InteractableObject interactable = currentInteractable.GetComponent<InteractableObject>();
+            if (interactable != null && !interactable.isInteractable)
+            {
+                promptE.SetActive(false);
+                return;
+            }
+            
             promptE.SetActive(true);
 
             if (Input.GetKeyDown(KeyCode.E))
@@ -63,8 +71,13 @@ public class InteractionSystem : MonoBehaviour
             StopAllCoroutines();
             StartCoroutine(FadeDescription(interactable.data));
             
-            // 🔥 ДОБАВЛЯЕМ ЗАПИСЬ В ДНЕВНИК 🔥
             AddToJournal(interactable.data);
+            
+            // 🔥 Уведомляем QuestManager о взаимодействии 🔥
+            if (QuestManager.Instance != null && !string.IsNullOrEmpty(interactable.data.journalEntryId))
+            {
+                QuestManager.Instance.OnTargetInteracted(interactable.data.journalEntryId);
+            }
         }
     }
 
@@ -73,7 +86,6 @@ public class InteractionSystem : MonoBehaviour
         isDescriptionActive = true;
         infoText.text = data.interactionDescription;
 
-        // Плавное появление
         float t = 0;
         while (t < 1f)
         {
@@ -83,10 +95,8 @@ public class InteractionSystem : MonoBehaviour
         }
         descriptionGroup.alpha = 1f;
 
-        // Ожидание
         yield return new WaitForSeconds(displayDuration);
 
-        // Плавное исчезновение
         t = 0;
         while (t < 1f)
         {
@@ -99,23 +109,11 @@ public class InteractionSystem : MonoBehaviour
         isDescriptionActive = false;
     }
 
-    // 🔥 НОВЫЙ МЕТОД: Добавление записи в дневник 🔥
     void AddToJournal(ItemData data)
     {
-        // Проверяем, есть ли данные для дневника
-        if (string.IsNullOrEmpty(data.journalEntryId))
-        {
-            Debug.Log($"[Journal] У предмета '{data.itemName}' нет journalEntryId, пропускаем");
-            return;
-        }
+        if (string.IsNullOrEmpty(data.journalEntryId)) return;
+        if (SaveManager.Instance == null) return;
 
-        if (SaveManager.Instance == null)
-        {
-            Debug.LogWarning("[Journal] SaveManager не найден!");
-            return;
-        }
-
-        // Создаём запись
         JournalEntry entry = new JournalEntry(
             id: data.journalEntryId,
             title: !string.IsNullOrEmpty(data.journalTitle) ? data.journalTitle : data.itemName,
@@ -124,21 +122,14 @@ public class InteractionSystem : MonoBehaviour
             isNpc: data.isNpcEntry
         );
 
-        // Пытаемся добавить (вернёт false, если уже есть)
         bool wasAdded = SaveManager.Instance.UnlockEntry(entry);
 
         if (wasAdded)
         {
-            Debug.Log($"[Journal] ✅ Новая запись добавлена: {entry.title}");
-            
-            // Если дневник открыт — обновляем его сразу
+            Debug.Log($"[Journal] ✅ Новая запись: {entry.title}");
             JournalUI jui = FindObjectOfType<JournalUI>();
             if (jui != null && jui.gameObject.activeSelf)
                 jui.Refresh();
-        }
-        else
-        {
-            Debug.Log($"[Journal] Запись '{entry.title}' уже существует, пропускаем");
         }
     }
 }
