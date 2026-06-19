@@ -63,23 +63,43 @@ public class InteractionSystem : MonoBehaviour
         }
     }
 
-    void Interact()
+   void Interact()
+{
+    InteractableObject interactable = currentInteractable.GetComponent<InteractableObject>();
+    if (interactable != null && interactable.data != null)
     {
-        InteractableObject interactable = currentInteractable.GetComponent<InteractableObject>();
-        if (interactable != null && interactable.data != null)
+        StopAllCoroutines();
+        StartCoroutine(FadeDescription(interactable.data));
+        
+        // 🔥 ВОСПРОИЗВЕДЕНИЕ ЗВУКА 🔥
+        PlayInteractionSound(interactable.data);
+        
+        AddToJournal(interactable.data);
+        
+        // Уведомляем QuestManager о взаимодействии
+        if (QuestManager.Instance != null && !string.IsNullOrEmpty(interactable.data.journalEntryId))
         {
-            StopAllCoroutines();
-            StartCoroutine(FadeDescription(interactable.data));
-            
-            AddToJournal(interactable.data);
-            
-            // 🔥 Уведомляем QuestManager о взаимодействии 🔥
-            if (QuestManager.Instance != null && !string.IsNullOrEmpty(interactable.data.journalEntryId))
-            {
-                QuestManager.Instance.OnTargetInteracted(interactable.data.journalEntryId);
-            }
+            QuestManager.Instance.OnTargetInteracted(interactable.data.journalEntryId);
         }
     }
+}
+
+// 🔥 НОВЫЙ МЕТОД: Воспроизведение звука взаимодействия 🔥
+void PlayInteractionSound(ItemData data)
+{
+    if (AudioManager.Instance == null) return;
+    
+    // Если указан кастомный звук — используем его
+    if (!string.IsNullOrEmpty(data.customSoundName))
+    {
+        AudioManager.Instance.PlaySFX(data.customSoundName, currentInteractable.position);
+    }
+    else
+    {
+        // Иначе используем стандартный звук "Interact"
+        AudioManager.Instance.PlaySFX("Interact", currentInteractable.position);
+    }
+}
 
     IEnumerator FadeDescription(ItemData data)
     {
