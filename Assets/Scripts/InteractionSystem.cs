@@ -129,27 +129,52 @@ void PlayInteractionSound(ItemData data)
         isDescriptionActive = false;
     }
 
-    void AddToJournal(ItemData data)
+  [Header("Ссылки на блоки дневника")]
+[Tooltip("Перетащи сюда все Entry_Block_1, Entry_Block_2 и т.д. из Hierarchy")]
+public GameObject[] journalBlocks;
+
+void AddToJournal(ItemData data)
+{
+    // Проверяем, должен ли этот предмет добавлять запись в дневник
+    if (!data.addToJournal)
     {
-        if (string.IsNullOrEmpty(data.journalEntryId)) return;
-        if (SaveManager.Instance == null) return;
-
-        JournalEntry entry = new JournalEntry(
-            id: data.journalEntryId,
-            title: !string.IsNullOrEmpty(data.journalTitle) ? data.journalTitle : data.itemName,
-            content: !string.IsNullOrEmpty(data.journalContent) ? data.journalContent : data.interactionDescription,
-            portrait: data.portraitSprite,
-            isNpc: data.isNpcEntry
-        );
-
-        bool wasAdded = SaveManager.Instance.UnlockEntry(entry);
-
-        if (wasAdded)
+        Debug.Log($"[Journal] Предмет '{data.itemName}' не добавляет запись (addToJournal = false)");
+        return;
+    }
+    
+    Debug.Log($"[Journal] Пытаемся активировать блок для предмета: {data.itemName}, ID: {data.journalEntryId}");
+    
+    if (journalBlocks == null || journalBlocks.Length == 0)
+    {
+        Debug.LogError("[Journal] Массив journalBlocks пуст! Перетащи блоки в Inspector у InteractionSystem!");
+        return;
+    }
+    
+    // Ищем блок по имени
+    string blockName = $"Entry_Block_{data.journalEntryId}";
+    bool found = false;
+    
+    foreach (GameObject block in journalBlocks)
+    {
+        if (block != null && block.name == blockName)
         {
-            Debug.Log($"[Journal] ✅ Новая запись: {entry.title}");
-            JournalUI jui = FindObjectOfType<JournalUI>();
-            if (jui != null && jui.gameObject.activeSelf)
-                jui.Refresh();
+            block.SetActive(true);
+            Debug.Log($"[Journal] ✅ Активирован блок: {blockName}");
+            found = true;
+            
+            // Обновляем текст, если нужно
+            TextMeshProUGUI textComp = block.GetComponentInChildren<TextMeshProUGUI>();
+            if (textComp != null && !string.IsNullOrEmpty(data.journalContent))
+            {
+                textComp.text = data.journalContent;
+            }
+            break;
         }
     }
+    
+    if (!found)
+    {
+        Debug.LogWarning($"[Journal] ❌ Блок '{blockName}' не найден в массиве journalBlocks!");
+    }
+}
 }
