@@ -31,4 +31,8 @@ public Sprite portraitSprite;
 
 [Tooltip("Это запись о персонаже? (true = NPC, false = предмет)")]
 public bool isNpcEntry;
+
+[Header("Диалог (для NPC)")]
+[Tooltip("Файл диалога (только для NPC)")]
+public DialogueData dialogue;
 }

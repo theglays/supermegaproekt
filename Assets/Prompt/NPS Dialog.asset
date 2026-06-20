@@ -15,9 +15,11 @@ MonoBehaviour:
   itemName: "\u0421\u0442\u0430\u0440\u044B\u0439 \u0437\u043D\u0430\u043A\u043E\u043C\u044B\u0439"
   interactionDescription: 
   customSoundName: 
+  addToJournal: 0
   journalEntryId: item_man1
-  journalTitle: "\u0421\u0442\u0430\u0440\u044B\u0439 \u0437\u043D\u0430\u043A\u043E\u043C\u044B\u0439"
+  journalTitle: "\u0414\u0438\u0430\u043B\u043E\u0433"
   journalContent: "\u041D\u043E\u0440\u043C\u0430\u043B\u044C\u043D\u044B\u0439 \u043C\u0443\u0436\u0438\u043A.
     \u041A\u0440\u0443\u0442\u043E\u0439"
   portraitSprite: {fileID: 0}
   isNpcEntry: 1
+  dialogue: {fileID: 11400000, guid: 716ce235a58af994bb6e32f626efcbe9, type: 2}

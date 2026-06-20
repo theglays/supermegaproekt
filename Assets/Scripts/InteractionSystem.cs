@@ -46,24 +46,45 @@ public class InteractionSystem : MonoBehaviour
         }
     }
 
-    void FindNearest()
-    {
-        InteractableObject[] interactables = FindObjectsByType<InteractableObject>(FindObjectsSortMode.None);
-        currentInteractable = null;
-        float minDist = Mathf.Infinity;
+void FindNearest()
+{
+    InteractableObject[] interactables = FindObjectsByType<InteractableObject>(FindObjectsSortMode.None);
+    currentInteractable = null;
+    float minDist = Mathf.Infinity;
 
-        foreach (InteractableObject obj in interactables)
+    Debug.Log($"[Interaction] Найдено объектов: {interactables.Length}");
+
+    foreach (InteractableObject obj in interactables)
+    {
+        // Проверяем, активен ли объект
+        if (!obj.isInteractable)
         {
-            float dist = Vector3.Distance(transform.position, obj.transform.position);
-            if (dist < minDist && dist < interactionDistance)
-            {
-                minDist = dist;
-                currentInteractable = obj.transform;
-            }
+            Debug.Log($"[Interaction] {obj.name} неактивен, пропускаем");
+            continue;
+        }
+        
+        float dist = Vector3.Distance(transform.position, obj.transform.position);
+        Debug.Log($"[Interaction] {obj.name}: дистанция={dist:F2}, interactionDistance={interactionDistance}");
+        
+        if (dist < minDist && dist < interactionDistance)
+        {
+            minDist = dist;
+            currentInteractable = obj.transform;
+            Debug.Log($"[Interaction] ✅ {obj.name} выбран как ближайший (дистанция: {dist:F2})");
         }
     }
+    
+    if (currentInteractable != null)
+    {
+        Debug.Log($"[Interaction] Итоговый объект: {currentInteractable.name}");
+    }
+    else
+    {
+        Debug.Log("[Interaction] Итоговый объект: НЕТ");
+    }
+}
 
-   void Interact()
+ void Interact()
 {
     InteractableObject interactable = currentInteractable.GetComponent<InteractableObject>();
     if (interactable != null && interactable.data != null)
@@ -71,15 +92,28 @@ public class InteractionSystem : MonoBehaviour
         StopAllCoroutines();
         StartCoroutine(FadeDescription(interactable.data));
         
-        // 🔥 ВОСПРОИЗВЕДЕНИЕ ЗВУКА 🔥
         PlayInteractionSound(interactable.data);
-        
         AddToJournal(interactable.data);
         
-        // Уведомляем QuestManager о взаимодействии
-        if (QuestManager.Instance != null && !string.IsNullOrEmpty(interactable.data.journalEntryId))
+        // 🔥 Проверяем, является ли это NPC с диалогом
+        if (interactable.data.isNpcEntry && interactable.data.dialogue != null)
         {
-            QuestManager.Instance.OnTargetInteracted(interactable.data.journalEntryId);
+            // Запускаем диалог
+            DialogueSystem.Instance.StartDialogue(interactable.data.dialogue);
+            
+            // Завершаем квест (если активен)
+            if (QuestManager.Instance != null)
+            {
+                QuestManager.Instance.OnTargetInteracted(interactable.data.journalEntryId);
+            }
+        }
+        else
+        {
+            // Обычное взаимодействие с предметом
+            if (QuestManager.Instance != null && !string.IsNullOrEmpty(interactable.data.journalEntryId))
+            {
+                QuestManager.Instance.OnTargetInteracted(interactable.data.journalEntryId);
+            }
         }
     }
 }
