@@ -24,18 +24,21 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    void Start()
+   void Start()
+{
+    if (quests.Count > 0)
     {
-        if (quests.Count > 0)
-        {
-            currentQuest = quests[0];
-            Debug.Log($"[Quest] Начата задача: {currentQuest.description}");
-            
-            // Уведомляем UI
-            QuestUI ui = FindObjectOfType<QuestUI>();
-            if (ui != null) ui.UpdateQuestDisplay(currentQuest);
-        }
+        currentQuest = quests[0];
+        Debug.Log($"[Quest] Начата задача: {currentQuest.description}");
+        
+        // Уведомляем UI
+        QuestUI ui = FindObjectOfType<QuestUI>();
+        if (ui != null) ui.UpdateQuestDisplay(currentQuest);
+        
+        // 🔥 Принудительно обновляем состояние объектов
+        UpdateInteractableStates();
     }
+}
 
     /// <summary>
     /// Вызывается при взаимодействии с предметом/NPC
@@ -106,6 +109,7 @@ public class QuestManager : MonoBehaviour
    void UpdateInteractableStates()
 {
     Debug.Log("[Quest] UpdateInteractableStates() начала работу");
+    Debug.Log($"[Quest] Текущая задача: {currentQuest?.description ?? "Нет активной задачи"}");
     
     InteractableObject[] allInteractables = FindObjectsByType<InteractableObject>(FindObjectsSortMode.None);
     Debug.Log($"[Quest] Найдено интерактивных объектов: {allInteractables.Length}");
@@ -115,34 +119,34 @@ public class QuestManager : MonoBehaviour
         if (obj.data == null)
         {
             Debug.LogWarning($"[Quest] У объекта {obj.name} нет ItemData!");
+            obj.SetInteractable(false); // Деактивируем объекты без данных
             continue;
         }
         
         string objId = obj.data.journalEntryId;
-        Debug.Log($"[Quest] Проверяем объект: {obj.name}, ID: {objId}");
+        
+        // 🔥 Если нет активной задачи — деактивируем всё
+        if (currentQuest == null)
+        {
+            obj.SetInteractable(false);
+            Debug.Log($"[Quest] {obj.name} (ID: {objId}) деактивирован (нет активной задачи)");
+            continue;
+        }
         
         bool shouldBeActive = false;
         
-        // Если текущая задача — взаимодействие с предметами
-        if (currentQuest.questType == QuestType.Interact)
+        // Проверяем, есть ли этот объект в списке целей текущей задачи
+        if (currentQuest.targetIds.Contains(objId))
         {
-            shouldBeActive = currentQuest.targetIds.Contains(objId);
-            Debug.Log($"[Quest] Тип Interact. shouldBeActive: {shouldBeActive}");
-        }
-        // Если текущая задача — диалог с NPC
-        else if (currentQuest.questType == QuestType.Talk)
-        {
-            shouldBeActive = currentQuest.targetIds.Contains(objId);
-            Debug.Log($"[Quest] Тип Talk. shouldBeActive: {shouldBeActive}");
+            shouldBeActive = true;
         }
         
         obj.SetInteractable(shouldBeActive);
-        Debug.Log($"[Quest] {obj.name} установлен как interactable: {shouldBeActive}");
+        Debug.Log($"[Quest] {obj.name} (ID: {objId}) установлен как interactable: {shouldBeActive}");
     }
     
     Debug.Log("[Quest] UpdateInteractableStates() завершена");
 }
-
     public Quest GetCurrentQuest() => currentQuest;
     public bool HasActiveQuest() => currentQuest != null && !currentQuest.IsCompleted();
 }
