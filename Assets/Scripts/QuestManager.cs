@@ -76,21 +76,12 @@ public class QuestManager : MonoBehaviour
     {
         currentQuest = quests[currentQuestIndex];
         Debug.Log($"[Quest] Новая задача: {currentQuest.description}");
-        Debug.Log($"[Quest] Тип задачи: {currentQuest.questType}");
-        Debug.Log($"[Quest] Целей в задаче: {currentQuest.targetIds.Count}");
-        
-        // Выводим все targetIds
-        for (int i = 0; i < currentQuest.targetIds.Count; i++)
-        {
-            Debug.Log($"[Quest] Target ID {i}: {currentQuest.targetIds[i]}");
-        }
         
         // Уведомляем UI
         QuestUI ui = FindObjectOfType<QuestUI>();
         if (ui != null) ui.UpdateQuestDisplay(currentQuest);
         
-        // 🔥 Блокируем/разблокируем объекты
-        Debug.Log("[Quest] Вызываем UpdateInteractableStates()...");
+        // Блокируем/разблокируем объекты
         UpdateInteractableStates();
     }
     else
@@ -106,39 +97,51 @@ public class QuestManager : MonoBehaviour
     /// <summary>
     /// Блокирует/разблокирует интерактивные объекты в зависимости от текущей задачи
     /// </summary>
-   void UpdateInteractableStates()
+ void UpdateInteractableStates()
 {
-    Debug.Log("[Quest] UpdateInteractableStates() начала работу");
+    Debug.Log($"[Quest] UpdateInteractableStates() начала работу");
     Debug.Log($"[Quest] Текущая задача: {currentQuest?.description ?? "Нет активной задачи"}");
     
     InteractableObject[] allInteractables = FindObjectsByType<InteractableObject>(FindObjectsSortMode.None);
-    Debug.Log($"[Quest] Найдено интерактивных объектов: {allInteractables.Length}");
     
     foreach (InteractableObject obj in allInteractables)
     {
         if (obj.data == null)
         {
-            Debug.LogWarning($"[Quest] У объекта {obj.name} нет ItemData!");
-            obj.SetInteractable(false); // Деактивируем объекты без данных
+            obj.SetInteractable(false);
             continue;
         }
         
         string objId = obj.data.journalEntryId;
+        bool shouldBeActive = false;
         
-        // 🔥 Если нет активной задачи — деактивируем всё
-        if (currentQuest == null)
+        // Если это NPC и он уже завершил диалог — всегда деактивируем
+        if (obj.data.isNpcEntry && obj.HasCompleted())
         {
             obj.SetInteractable(false);
-            Debug.Log($"[Quest] {obj.name} (ID: {objId}) деактивирован (нет активной задачи)");
+            Debug.Log($"[Quest] {obj.name} — NPC завершил диалог, деактивирован");
             continue;
         }
         
-        bool shouldBeActive = false;
-        
-        // Проверяем, есть ли этот объект в списке целей текущей задачи
-        if (currentQuest.targetIds.Contains(objId))
+        if (currentQuest == null)
         {
-            shouldBeActive = true;
+            obj.SetInteractable(false);
+            continue;
+        }
+        
+        //  СПЕЦИАЛЬНАЯ ЛОГИКА ДЛЯ ТРЕТЬЕЙ ЗАДАЧИ "Найдите выход"
+        if (currentQuest.questId == "quest_find_exit")
+        {
+            // Активируем ВСЕ предметы (кроме NPC), но цель только дверь
+            if (!obj.data.isNpcEntry)
+            {
+                shouldBeActive = true;
+            }
+        }
+        else
+        {
+            // Обычная логика: активируем только объекты из списка целей
+            shouldBeActive = currentQuest.targetIds.Contains(objId);
         }
         
         obj.SetInteractable(shouldBeActive);

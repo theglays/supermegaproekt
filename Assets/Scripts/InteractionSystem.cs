@@ -89,23 +89,68 @@ void FindNearest()
     InteractableObject interactable = currentInteractable.GetComponent<InteractableObject>();
     if (interactable != null && interactable.data != null)
     {
+        // Если это NPC и он уже завершил диалог — ничего не делаем
+        if (interactable.data.isNpcEntry && interactable.HasCompleted())
+        {
+            Debug.Log($"[Interaction] NPC '{interactable.data.itemName}' уже завершил диалог");
+            return;
+        }
+
         StopAllCoroutines();
         StartCoroutine(FadeDescription(interactable.data));
         
         PlayInteractionSound(interactable.data);
         AddToJournal(interactable.data);
         
-        // 🔥 Проверяем, является ли это NPC с диалогом
-        if (interactable.data.isNpcEntry && interactable.data.dialogue != null)
+        // 🔥 Проверяем, является ли это дверью выхода
+        if (interactable.data.journalEntryId == "door_exit")
         {
-            // Запускаем диалог
-            DialogueSystem.Instance.StartDialogue(interactable.data.dialogue);
+            Debug.Log("[Interaction] Дверь выхода! Запускаем переход...");
             
-            // Завершаем квест (если активен)
+            // Завершаем квест
             if (QuestManager.Instance != null)
             {
                 QuestManager.Instance.OnTargetInteracted(interactable.data.journalEntryId);
             }
+            
+            // Запускаем переход на Level 2 через небольшую задержку
+            Invoke("TransitionToNextLevel", 1.5f);
+            return;
+        }
+        
+        // Проверяем, является ли это NPC с диалогом
+               // Проверяем, является ли это NPC с диалогом
+        if (interactable.data.isNpcEntry && interactable.data.dialogue != null)
+        {
+            // Запускаем диалог и передаем действие, которое выполнится ПОСЛЕ его окончания
+            DialogueSystem.Instance.StartDialogue(interactable.data.dialogue, () => 
+            {
+                // Помечаем NPC как завершившего диалог
+                interactable.MarkAsCompleted();
+                
+                // Завершаем квест (и запускаем 3-ю задачу) ТОЛЬКО сейчас
+                if (QuestManager.Instance != null)
+                {
+                    QuestManager.Instance.OnTargetInteracted(interactable.data.journalEntryId);
+                }
+                
+                // 🔥 АКТИВИРУЕМ БЛОК В ДНЕВНИКЕ
+                if (!string.IsNullOrEmpty(interactable.data.journalBlockName))
+                {
+                    GameObject journalBlock = GameObject.Find(interactable.data.journalBlockName);
+                    if (journalBlock != null)
+                    {
+                        journalBlock.SetActive(true);
+                        Debug.Log($"[Interaction] Активирован блок дневника: {interactable.data.journalBlockName}");
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[Interaction] Блок дневника '{interactable.data.journalBlockName}' не найден!");
+                    }
+                }
+                
+                Debug.Log("[Interaction] Диалог окончен, квест обновлен.");
+            });
         }
         else
         {
@@ -118,7 +163,17 @@ void FindNearest()
     }
 }
 
-// 🔥 НОВЫЙ МЕТОД: Воспроизведение звука взаимодействия 🔥
+void TransitionToNextLevel()
+{
+    if (LevelTransition.Instance != null)
+    {
+        LevelTransition.Instance.TransitionToLevel("Level2"); // Замени на точное имя сцены!
+    }
+    else
+    {
+        Debug.LogError("[Interaction] LevelTransition.Instance не найден!");
+    }
+}
 void PlayInteractionSound(ItemData data)
 {
     if (AudioManager.Instance == null) return;

@@ -32,6 +32,9 @@ public Sprite portraitSprite;
 [Tooltip("Это запись о персонаже? (true = NPC, false = предмет)")]
 public bool isNpcEntry;
 
+[Tooltip("Имя блока в дневнике, который нужно активировать (например, Entry_Block_2)")]
+public string journalBlockName; // 🔥 НОВОЕ ПОЛЕ
+
 [Header("Диалог (для NPC)")]
 [Tooltip("Файл диалога (только для NPC)")]
 public DialogueData dialogue;

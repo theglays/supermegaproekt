@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 using System.Collections;
 
 public class DialogueSystem : MonoBehaviour
@@ -13,6 +14,7 @@ public class DialogueSystem : MonoBehaviour
     public TextMeshProUGUI speakerNameText;   // Имя говорящего
     public TextMeshProUGUI dialogueText;      // Текст диалога
     public Button nextButton;                 // Кнопка "Далее"
+    private System.Action onDialogueFinished; // 🔥 НОВОЕ
 
     [Header("Настройки анимации")]
     public float typingSpeed = 0.05f;         // Скорость вывода текста (секунд на символ)
@@ -46,22 +48,31 @@ public class DialogueSystem : MonoBehaviour
     /// <summary>
     /// Начать диалог
     /// </summary>
-    public void StartDialogue(DialogueData dialogue)
+  public void StartDialogue(DialogueData dialogue, System.Action onFinish = null)
+{
+    if (dialogue == null || dialogue.lines.Length == 0)
     {
-        if (dialogue == null || dialogue.lines.Length == 0)
-        {
-            Debug.LogError("[Dialogue] Диалог пуст или не назначен!");
-            return;
-        }
-
-        currentDialogue = dialogue;
-        currentLineIndex = 0;
-
-        if (dialoguePanel != null)
-            dialoguePanel.SetActive(true);
-
-        ShowLine();
+        Debug.LogError("[Dialogue] Диалог пуст или не назначен!");
+        return;
     }
+
+    currentDialogue = dialogue;
+    currentLineIndex = 0;
+    onDialogueFinished = onFinish;
+
+    if (dialoguePanel != null)
+        dialoguePanel.SetActive(true);
+
+    // 🔥 СКРЫВАЕМ ПЛАШКУ ЗАДАЧ ПРИ НАЧАЛЕ ДИАЛОГА
+    QuestUI questUI = FindObjectOfType<QuestUI>();
+    if (questUI != null)
+    {
+        questUI.HideQuest();
+        Debug.Log("[Dialogue] Плашка задач скрыта");
+    }
+
+    ShowLine();
+}
 
     /// <summary>
     /// Показать текущую строку
@@ -175,16 +186,40 @@ public class DialogueSystem : MonoBehaviour
     /// <summary>
     /// Завершить диалог
     /// </summary>
-    void EndDialogue()
+  void EndDialogue()
+{
+    if (dialoguePanel != null)
+        dialoguePanel.SetActive(false);
+
+    currentDialogue = null;
+    currentLineIndex = 0;
+
+    // Вызываем действие, если оно было передано
+    if (onDialogueFinished != null)
     {
-        if (dialoguePanel != null)
-            dialoguePanel.SetActive(false);
-
-        currentDialogue = null;
-        currentLineIndex = 0;
-
-        Debug.Log("[Dialogue] Диалог завершён");
+        onDialogueFinished.Invoke();
+        onDialogueFinished = null;
     }
+
+    //  ПОКАЗЫВАЕМ ПЛАШКУ ЗАДАЧ ПОСЛЕ ЗАВЕРШЕНИЯ ДИАЛОГА
+    QuestUI questUI = FindObjectOfType<QuestUI>();
+    if (questUI != null && QuestManager.Instance != null)
+    {
+        Quest currentQuest = QuestManager.Instance.GetCurrentQuest();
+        if (currentQuest != null)
+        {
+            questUI.UpdateQuestDisplay(currentQuest);
+            Debug.Log("[Dialogue] Плашка задач показана с новой задачей");
+        }
+        else
+        {
+            questUI.HideQuest();
+            Debug.Log("[Dialogue] Все задачи выполнены, плашка скрыта");
+        }
+    }
+
+    Debug.Log("[Dialogue] Диалог завершён");
+}
 
     void Update()
     {
