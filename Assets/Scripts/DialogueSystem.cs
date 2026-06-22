@@ -45,9 +45,7 @@ public class DialogueSystem : MonoBehaviour
             nextButton.gameObject.SetActive(false);
     }
 
-    /// <summary>
     /// Начать диалог
-    /// </summary>
   public void StartDialogue(DialogueData dialogue, System.Action onFinish = null)
 {
     if (dialogue == null || dialogue.lines.Length == 0)
@@ -78,48 +76,63 @@ public class DialogueSystem : MonoBehaviour
     /// Показать текущую строку
     /// </summary>
     void ShowLine()
+{
+    if (currentLineIndex >= currentDialogue.lines.Length)
     {
-        if (currentLineIndex >= currentDialogue.lines.Length)
-        {
-            EndDialogue();
-            return;
-        }
-
-        DialogueLine line = currentDialogue.lines[currentLineIndex];
-
-        // Устанавливаем портрет
-        if (portraitImage != null && line.portrait != null)
-        {
-            portraitImage.sprite = line.portrait;
-            portraitImage.gameObject.SetActive(true);
-        }
-        else if (portraitImage != null)
-        {
-            portraitImage.gameObject.SetActive(false);
-        }
-
-        // Устанавливаем имя говорящего
-        if (speakerNameText != null)
-        {
-            speakerNameText.text = line.speakerName;
-            speakerNameText.gameObject.SetActive(!string.IsNullOrEmpty(line.speakerName));
-        }
-
-        // Запускаем анимацию текста
-        fullText = line.text;
-        if (dialogueText != null)
-            dialogueText.text = "";
-
-        // Скрываем кнопку "Далее"
-        if (nextButton != null)
-            nextButton.gameObject.SetActive(false);
-
-        // Запускаем побуквенный вывод
-        isTyping = true;
-        if (typingCoroutine != null)
-            StopCoroutine(typingCoroutine);
-        typingCoroutine = StartCoroutine(TypeText());
+        EndDialogue();
+        return;
     }
+
+    DialogueLine line = currentDialogue.lines[currentLineIndex];
+
+    // 🔥 ВОСПРОИЗВЕДЕНИЕ ЗВУКА ФРАЗЫ
+    if (AudioManager.Instance != null)
+    {
+        if (!string.IsNullOrEmpty(line.voiceSoundName))
+        {
+            // Если указан кастомный звук — используем его
+            AudioManager.Instance.PlaySFX(line.voiceSoundName);
+        }
+        else
+        {
+            // Иначе используем стандартный звук диалога
+            AudioManager.Instance.PlaySFX("Dialogue_Default");
+        }
+    }
+
+    // Устанавливаем портрет
+    if (portraitImage != null && line.portrait != null)
+    {
+        portraitImage.sprite = line.portrait;
+        portraitImage.gameObject.SetActive(true);
+    }
+    else if (portraitImage != null)
+    {
+        portraitImage.gameObject.SetActive(false);
+    }
+
+    // Устанавливаем имя говорящего
+    if (speakerNameText != null)
+    {
+        speakerNameText.text = line.speakerName;
+        speakerNameText.gameObject.SetActive(!string.IsNullOrEmpty(line.speakerName));
+    }
+
+    // Запускаем анимацию текста
+    fullText = line.text;
+    if (dialogueText != null)
+        dialogueText.text = "";
+
+    // Скрываем кнопку "Далее"
+    if (nextButton != null)
+        nextButton.gameObject.SetActive(false);
+
+    // Запускаем побуквенный вывод
+    isTyping = true;
+    if (typingCoroutine != null)
+        StopCoroutine(typingCoroutine);
+    typingCoroutine = StartCoroutine(TypeText());
+}
 
     /// <summary>
     /// Анимация побуквенного вывода текста

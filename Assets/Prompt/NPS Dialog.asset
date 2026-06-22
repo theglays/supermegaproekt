@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemName: "\u0421\u0442\u0430\u0440\u044B\u0439 \u0437\u043D\u0430\u043A\u043E\u043C\u044B\u0439"
   interactionDescription: 
-  customSoundName: 
+  customSoundName: sound_man1
   addToJournal: 1
   journalEntryId: item_man1
   journalTitle: "\u0414\u0438\u0430\u043B\u043E\u0433"

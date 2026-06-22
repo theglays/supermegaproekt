@@ -8,6 +8,7 @@ public class CameraFollow : MonoBehaviour
 
     void Start()
     {
+            DontDestroyOnLoad(gameObject);
         // Запоминаем изначальное смещение камеры относительно игрока
         offset = transform.position - target.position;
     }

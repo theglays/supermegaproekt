@@ -102,23 +102,42 @@ void FindNearest()
         PlayInteractionSound(interactable.data);
         AddToJournal(interactable.data);
         
-        // 🔥 Проверяем, является ли это дверью выхода
-        if (interactable.data.journalEntryId == "door_exit")
+// Проверяем, является ли это дверью выхода
+if (interactable.data.journalEntryId == "door_exit")
+{
+    Debug.Log("[Interaction] 🚪 Дверь выхода! Начинаем переход...");
+    
+    // Завершаем квест
+    if (QuestManager.Instance != null)
+    {
+        QuestManager.Instance.OnTargetInteracted(interactable.data.journalEntryId);
+    }
+    
+    // Проверяем LevelTransition
+    if (LevelTransition.Instance != null)
+    {
+        Debug.Log("[Interaction] ✅ LevelTransition.Instance найден");
+        
+        if (LevelTransition.Instance.fadeImage != null)
         {
-            Debug.Log("[Interaction] Дверь выхода! Запускаем переход...");
-            
-            // Завершаем квест
-            if (QuestManager.Instance != null)
-            {
-                QuestManager.Instance.OnTargetInteracted(interactable.data.journalEntryId);
-            }
-            
-            // Запускаем переход на Level 2 через небольшую задержку
-            Invoke("TransitionToNextLevel", 1.5f);
-            return;
+            Debug.Log("[Interaction] ✅ fadeImage назначен");
+        }
+        else
+        {
+            Debug.LogError("[Interaction] ❌ fadeImage НЕ назначен в Inspector!");
         }
         
-        // Проверяем, является ли это NPC с диалогом
+        // Запускаем переход через небольшую задержку
+        Invoke("TransitionToNextLevel", 1.5f);
+    }
+    else
+    {
+        Debug.LogError("[Interaction] ❌ LevelTransition.Instance НЕ найден!");
+    }
+    
+    return; // 🔥 ВАЖНО: выходим из метода, чтобы не выполнялся остальной код
+}
+        
                // Проверяем, является ли это NPC с диалогом
         if (interactable.data.isNpcEntry && interactable.data.dialogue != null)
         {
@@ -134,18 +153,36 @@ void FindNearest()
                     QuestManager.Instance.OnTargetInteracted(interactable.data.journalEntryId);
                 }
                 
-                // 🔥 АКТИВИРУЕМ БЛОК В ДНЕВНИКЕ
+                // АКТИВИРУЕМ БЛОК В ДНЕВНИКЕ через массив прямых ссылок
                 if (!string.IsNullOrEmpty(interactable.data.journalBlockName))
                 {
-                    GameObject journalBlock = GameObject.Find(interactable.data.journalBlockName);
-                    if (journalBlock != null)
+                    bool blockFound = false;
+                    
+                    if (journalBlocks != null)
                     {
-                        journalBlock.SetActive(true);
-                        Debug.Log($"[Interaction] Активирован блок дневника: {interactable.data.journalBlockName}");
+                        foreach (GameObject block in journalBlocks)
+                        {
+                            if (block != null && block.name == interactable.data.journalBlockName)
+                            {
+                                block.SetActive(true);
+                                Debug.Log($"[Interaction] ✅ Активирован блок дневника: {interactable.data.journalBlockName}");
+                                blockFound = true;
+                                
+                                // 🔥 ПОКАЗЫВАЕМ УВЕДОМЛЕНИЕ О НОВОЙ ЗАПИСИ
+                                JournalUI journalUI = FindObjectOfType<JournalUI>();
+                                if (journalUI != null)
+                                {
+                                    journalUI.ShowNotification();
+                                }
+                                
+                                break;
+                            }
+                        }
                     }
-                    else
+                    
+                    if (!blockFound)
                     {
-                        Debug.LogWarning($"[Interaction] Блок дневника '{interactable.data.journalBlockName}' не найден!");
+                        Debug.LogWarning($"[Interaction] ❌ Блок дневника '{interactable.data.journalBlockName}' не найден в массиве journalBlocks!");
                     }
                 }
                 
@@ -165,13 +202,16 @@ void FindNearest()
 
 void TransitionToNextLevel()
 {
+    Debug.Log("[Interaction] 🔄 Вызываем TransitionToNextLevel()...");
+    
     if (LevelTransition.Instance != null)
     {
-        LevelTransition.Instance.TransitionToLevel("Level2"); // Замени на точное имя сцены!
+        Debug.Log("[Interaction] ✅ Запускаем TransitionToLevel('Level2')");
+        LevelTransition.Instance.TransitionToLevel("Level2");
     }
     else
     {
-        Debug.LogError("[Interaction] LevelTransition.Instance не найден!");
+        Debug.LogError("[Interaction] ❌ LevelTransition.Instance не найден!");
     }
 }
 void PlayInteractionSound(ItemData data)
@@ -227,7 +267,6 @@ void AddToJournal(ItemData data)
     // Проверяем, должен ли этот предмет добавлять запись в дневник
     if (!data.addToJournal)
     {
-        Debug.Log($"[Journal] Предмет '{data.itemName}' не добавляет запись (addToJournal = false)");
         return;
     }
     
@@ -257,6 +296,14 @@ void AddToJournal(ItemData data)
             {
                 textComp.text = data.journalContent;
             }
+            
+            // 🔥 ПОКАЗЫВАЕМ УВЕДОМЛЕНИЕ О НОВОЙ ЗАПИСИ
+            JournalUI journalUI = FindObjectOfType<JournalUI>();
+            if (journalUI != null)
+            {
+                journalUI.ShowNotification();
+            }
+            
             break;
         }
     }

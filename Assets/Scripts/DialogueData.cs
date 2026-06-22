@@ -4,14 +4,17 @@ using UnityEngine;
 [Serializable]
 public class DialogueLine
 {
-    public string speakerName;        // Имя говорящего (опционально)
-    public Sprite portrait;           // Портрет говорящего
+    public string speakerName;
+    public Sprite portrait;
     [TextArea(3, 5)]
-    public string text;               // Текст реплики
+    public string text;
+    
+    [Tooltip("Имя звука для этой фразы (как в AudioManager). Оставь пустым для стандартного")]
+    public string voiceSoundName; // 🔥 НОВОЕ ПОЛЕ
 }
 
 [CreateAssetMenu(fileName = "NewDialogue", menuName = "Game/Dialogue")]
 public class DialogueData : ScriptableObject
 {
-    public DialogueLine[] lines;      // Массив реплик
+    public DialogueLine[] lines;
 }

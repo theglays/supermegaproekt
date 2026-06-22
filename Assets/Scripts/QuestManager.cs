@@ -24,7 +24,7 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-   void Start()
+ void Start()
 {
     if (quests.Count > 0)
     {
@@ -35,14 +35,11 @@ public class QuestManager : MonoBehaviour
         QuestUI ui = FindObjectOfType<QuestUI>();
         if (ui != null) ui.UpdateQuestDisplay(currentQuest);
         
-        // 🔥 Принудительно обновляем состояние объектов
-        UpdateInteractableStates();
+        // 🔥 ВЫЗЫВАЕМ С ЗАДЕРЖКОЙ чтобы объекты успели загрузиться
+        Invoke("UpdateInteractableStates", 0.5f);
     }
 }
-
-    /// <summary>
     /// Вызывается при взаимодействии с предметом/NPC
-    /// </summary>
     public void OnTargetInteracted(string targetId)
     {
         if (currentQuest == null || currentQuest.IsCompleted()) return;
@@ -67,37 +64,54 @@ public class QuestManager : MonoBehaviour
     }
 
    void CompleteCurrentQuest()
-{
-    Debug.Log($"[Quest] Задача завершена! Текущий индекс: {currentQuestIndex}");
-    
-    currentQuestIndex++;
-    
-    if (currentQuestIndex < quests.Count)
     {
-        currentQuest = quests[currentQuestIndex];
-        Debug.Log($"[Quest] Новая задача: {currentQuest.description}");
+        Debug.Log($"[Quest] Задача завершена! Текущий индекс: {currentQuestIndex}");
         
-        // Уведомляем UI
-        QuestUI ui = FindObjectOfType<QuestUI>();
-        if (ui != null) ui.UpdateQuestDisplay(currentQuest);
+        currentQuestIndex++;
         
-        // Блокируем/разблокируем объекты
-        UpdateInteractableStates();
-    }
-    else
-    {
-        Debug.Log("[Quest] Все задачи выполнены!");
-        currentQuest = null;
-        
-        QuestUI ui = FindObjectOfType<QuestUI>();
-        if (ui != null) ui.HideQuest();
-    }
-}
+        if (currentQuestIndex < quests.Count)
+        {
+            currentQuest = quests[currentQuestIndex];
+            Debug.Log($"[Quest] Новая задача: {currentQuest.description}");
+            
+            // Уведомляем UI
+            QuestUI ui = FindObjectOfType<QuestUI>();
+            if (ui != null) ui.UpdateQuestDisplay(currentQuest);
+            
+            // Блокируем/разблокируем объекты
+            UpdateInteractableStates();
 
+            // 🔥 ВОСПРОИЗВЕДЕНИЕ ЗВУКА ДЛЯ НОВОЙ ЗАДАЧИ
+            PlayQuestSound();
+        }
+        else
+        {
+            Debug.Log("[Quest] Все задачи выполнены!");
+            currentQuest = null;
+            
+            QuestUI ui = FindObjectOfType<QuestUI>();
+            if (ui != null) ui.HideQuest();
+        }
+    }
+
+    // 🔥 НОВЫЙ МЕТОД: Воспроизведение звука задачи
+    void PlayQuestSound()
+    {
+        if (AudioManager.Instance != null)
+        {
+            // Замени "Quest_New" на точное имя звука в твоем AudioManager
+            AudioManager.Instance.PlaySFX("Quest_New"); 
+            Debug.Log("[Quest] Звук новой задачи воспроизведен");
+        }
+        else
+        {
+            Debug.LogWarning("[Quest] AudioManager не найден!");
+        }
+    }
     /// <summary>
     /// Блокирует/разблокирует интерактивные объекты в зависимости от текущей задачи
     /// </summary>
- void UpdateInteractableStates()
+void UpdateInteractableStates()
 {
     Debug.Log($"[Quest] UpdateInteractableStates() начала работу");
     Debug.Log($"[Quest] Текущая задача: {currentQuest?.description ?? "Нет активной задачи"}");

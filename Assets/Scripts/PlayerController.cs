@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        DontDestroyOnLoad(gameObject);
         sr = GetComponent<SpriteRenderer>();
         targetPosition = transform.position;
         

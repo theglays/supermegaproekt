@@ -39,8 +39,15 @@ public class AudioManager : MonoBehaviour
     void Awake()
     {
         // 1. Синглтон
-        if (Instance == null) Instance = this;
-        else { Destroy(gameObject); return; }
+      if (Instance == null)
+    {
+        Instance = this;
+        DontDestroyOnLoad(gameObject); // 🔥 ЭТА СТРОКА
+    }
+    else
+    {
+        Destroy(gameObject);
+    }
 
         // 2. Загрузка сохранённой громкости
         sfxVolume = PlayerPrefs.GetFloat("SFX_Volume", 1f);

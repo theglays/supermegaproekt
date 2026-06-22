@@ -31,50 +31,60 @@ public class LevelTransition : MonoBehaviour
         }
     }
 
-    /// <summary>
     /// Плавное затемнение и переход на следующий уровень
-    /// </summary>
-    public void TransitionToLevel(string levelName)
+public void TransitionToLevel(string levelName)
+{
+    Debug.Log($"[Transition] 🎬 TransitionToLevel('{levelName}') вызван");
+    
+    if (fadeImage == null)
     {
-        StartCoroutine(FadeAndLoad(levelName));
+        Debug.LogError("[Transition] ❌ fadeImage не назначен в Inspector!");
+        return;
+    }
+    
+    Debug.Log($"[Transition] ✅ fadeImage назначен, запускаем корутину FadeAndLoad('{levelName}')");
+    StartCoroutine(FadeAndLoad(levelName));
+}
+
+   IEnumerator FadeAndLoad(string levelName)
+{
+    Debug.Log("[Transition] 🎨 Корутина FadeAndLoad началась");
+    
+    if (fadeImage == null)
+    {
+        Debug.LogError("[Transition] ❌ fadeImage = null в корутине!");
+        yield break;
     }
 
-    IEnumerator FadeAndLoad(string levelName)
+    // Сохраняем прогресс
+    if (SaveManager.Instance != null)
     {
-        if (fadeImage == null)
-        {
-            Debug.LogError("[Transition] fadeImage не назначен!");
-            yield break;
-        }
-
-        // Сохраняем прогресс перед переходом
-        if (SaveManager.Instance != null)
-        {
-            SaveManager.Instance.SaveGame();
-        }
-
-        // Затемнение
-        float elapsed = 0f;
-        Color startColor = fadeImage.color;
-        Color endColor = new Color(0, 0, 0, 1);
-
-        while (elapsed < fadeDuration)
-        {
-            elapsed += Time.deltaTime;
-            fadeImage.color = Color.Lerp(startColor, endColor, elapsed / fadeDuration);
-            yield return null;
-        }
-
-        fadeImage.color = endColor;
-
-        // Загружаем следующую сцену
-        Debug.Log($"[Transition] Загрузка уровня: {levelName}");
-        SceneManager.LoadScene(levelName);
+        Debug.Log("[Transition] 💾 Сохраняем игру...");
+        SaveManager.Instance.SaveGame();
     }
 
-    /// <summary>
-    /// Плавное появление после загрузки уровня
-    /// </summary>
+    // Затемнение
+    Debug.Log("[Transition] 🌑 Начинаем затемнение...");
+    float elapsed = 0f;
+    Color startColor = fadeImage.color;
+    Color endColor = new Color(0, 0, 0, 1);
+
+    while (elapsed < fadeDuration)
+    {
+        elapsed += Time.deltaTime;
+        fadeImage.color = Color.Lerp(startColor, endColor, elapsed / fadeDuration);
+        Debug.Log($"[Transition] Прогресс затемнения: {elapsed:F2} / {fadeDuration:F2}");
+        yield return null;
+    }
+
+    fadeImage.color = endColor;
+    Debug.Log($"[Transition] ✅ Затемнение завершено. Загрузка сцены: {levelName}");
+
+    // Загружаем следующую сцену
+    SceneManager.LoadScene(levelName);
+}
+
+    /// Плавное появление после загрузки уровн
     public void FadeIn()
     {
         if (fadeImage != null)

@@ -17,6 +17,7 @@ public class LevelMusicController : MonoBehaviour
 
     void Start()
     {
+            DontDestroyOnLoad(gameObject);
         // Ждем 1 кадр, чтобы AudioManager точно успел инициализироваться
         StartCoroutine(PlayLevelMusic());
     }

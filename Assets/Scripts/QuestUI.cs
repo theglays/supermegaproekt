@@ -10,6 +10,7 @@ public class QuestUI : MonoBehaviour
 
     void Start()
     {
+            DontDestroyOnLoad(gameObject);
         if (questPanel != null)
             questPanel.SetActive(false);
     }
