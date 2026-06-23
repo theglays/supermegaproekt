@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 
@@ -23,12 +24,13 @@ public class IntroSequence : MonoBehaviour
     public string text4 = "Но цена ошибки — жизнь.";
 
     [Header("Музыка интро")]
-    public AudioClip introMusic;  // 🔥 Музыка для интро
+    public AudioClip introMusic;
     public float introMusicVolume = 0.8f;
 
     [Header("Настройки")]
     public float typingSpeed = 0.05f;
     public float fadeDuration = 1.5f;
+    public float endFadeDuration = 2f;  // 🔥 Длительность финального затемнения
 
     private int currentPhraseIndex = 0;
     private bool isTyping = false;
@@ -36,21 +38,15 @@ public class IntroSequence : MonoBehaviour
     private TextMeshProUGUI currentTextObject;
     private Coroutine typingCoroutine;
     private bool isIntroActive = false;
-    private AudioSource audioSource;  // 🔥 AudioSource для музыки
+    private AudioSource audioSource;
 
     void Awake()
     {
-        // Создаём AudioSource для музыки интро
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.playOnAwake = false;
         audioSource.loop = false;
-        
-        Debug.Log("[IntroSequence] AudioSource создан");
     }
 
-    /// <summary>
-    /// Вызывается кнопкой "Начать игру"
-    /// </summary>
     public void StartIntro()
     {
         if (isIntroActive) return;
@@ -58,44 +54,28 @@ public class IntroSequence : MonoBehaviour
 
         Debug.Log("[Intro] Начинаем интро...");
         
-        // 🔥 ОСТАНАВЛИВАЕМ МУЗЫКУ МЕНЮ
         StopMenuMusic();
-        
-        // 🔥 ЗАПУСКАЕМ МУЗЫКУ ИНТРО
         PlayIntroMusic();
         
-        // Показываем canvas
         if (introCanvas != null)
             introCanvas.SetActive(true);
 
-        // Запускаем корутину
         StartCoroutine(PlayIntroSequence());
     }
 
-    /// <summary>
-    /// Остановить музыку меню
-    /// </summary>
     void StopMenuMusic()
     {
-        // Ищем все AudioSource в сцене Menu
         AudioSource[] allAudioSources = FindObjectsByType<AudioSource>(FindObjectsSortMode.None);
         
         foreach (AudioSource source in allAudioSources)
         {
-            // Останавливаем всё что играет (кроме нашего audioSource)
             if (source != audioSource && source.isPlaying)
             {
-                Debug.Log($"[Intro] Останавливаем: {source.gameObject.name}");
                 source.Stop();
             }
         }
-        
-        Debug.Log("[Intro] Музыка меню остановлена");
     }
 
-    /// <summary>
-    /// Играть музыку интро
-    /// </summary>
     void PlayIntroMusic()
     {
         if (introMusic != null && audioSource != null)
@@ -103,23 +83,14 @@ public class IntroSequence : MonoBehaviour
             audioSource.clip = introMusic;
             audioSource.volume = introMusicVolume;
             audioSource.Play();
-            Debug.Log("[Intro] Музыка интро играет");
-        }
-        else
-        {
-            Debug.LogWarning("[Intro] introMusic не назначена!");
         }
     }
 
-    /// <summary>
-    /// Остановить музыку интро
-    /// </summary>
     void StopIntroMusic()
     {
         if (audioSource != null && audioSource.isPlaying)
         {
             audioSource.Stop();
-            Debug.Log("[Intro] Музыка интро остановлена");
         }
     }
 
@@ -132,7 +103,6 @@ public class IntroSequence : MonoBehaviour
         currentPhraseIndex = 0;
         ShowNextPhrase();
 
-        // Ждём пока все фразы не будут показаны
         while (currentPhraseIndex < 4)
         {
             yield return null;
@@ -141,13 +111,73 @@ public class IntroSequence : MonoBehaviour
         // 3. После 4-й фразы ждём клика
         yield return new WaitUntil(() => Input.GetMouseButtonDown(0));
 
-        // 4. Скрываем текст и загружаем Level1
+        // 4. 🔥 ПЛАВНОЕ ЗАТЕМНЕНИЕ
+        Debug.Log("[Intro] Начинаем плавное затемнение...");
+        yield return StartCoroutine(FadeToBlack());
+
+        // 5. Загружаем Level1
         Debug.Log("[Intro] Загружаем Level1...");
-        
-        // 🔥 ОСТАНАВЛИВАЕМ МУЗЫКУ ИНТРО
         StopIntroMusic();
         
-        yield return StartCoroutine(FadeOutAndLoadLevel());
+        SceneManager.LoadScene("Level1");
+    }
+
+    /// <summary>
+    /// Плавное затемнение экрана
+    /// </summary>
+    IEnumerator FadeToBlack()
+    {
+        // Создаём чёрную панель если её нет
+        Image fadeImage = GetOrCreateFadeImage();
+        
+        if (fadeImage == null)
+        {
+            Debug.LogError("[Intro] Не удалось создать FadeImage!");
+            yield break;
+        }
+
+        // Анимируем прозрачность от 0 до 1
+        float elapsed = 0f;
+        Color startColor = new Color(0, 0, 0, 0);
+        Color endColor = new Color(0, 0, 0, 1);
+
+        while (elapsed < endFadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / endFadeDuration;
+            fadeImage.color = Color.Lerp(startColor, endColor, t);
+            yield return null;
+        }
+
+        fadeImage.color = endColor;
+        Debug.Log("[Intro] Затемнение завершено");
+    }
+
+    /// <summary>
+    /// Получает или создаёт FadeImage
+    /// </summary>
+    Image GetOrCreateFadeImage()
+    {
+        // Ищем существующий FadeImage
+        Image fadeImage = GameObject.Find("FadeImage")?.GetComponent<Image>();
+        
+        if (fadeImage != null)
+            return fadeImage;
+
+        // Создаём новый
+        GameObject fadeObj = new GameObject("FadeImage");
+        fadeObj.transform.SetParent(introCanvas.transform, false);
+        
+        RectTransform rect = fadeObj.AddComponent<RectTransform>();
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.sizeDelta = Vector2.zero;
+        
+        Image img = fadeObj.AddComponent<Image>();
+        img.color = new Color(0, 0, 0, 0);
+        img.raycastTarget = false;
+        
+        return img;
     }
 
     void ShowNextPhrase()
@@ -164,7 +194,6 @@ public class IntroSequence : MonoBehaviour
 
         if (currentTextObject == null)
         {
-            Debug.LogError($"[Intro] Phrase{currentPhraseIndex + 1} не назначен!");
             currentPhraseIndex++;
             return;
         }
@@ -226,18 +255,5 @@ public class IntroSequence : MonoBehaviour
                 }
             }
         }
-    }
-
-    IEnumerator FadeOutAndLoadLevel()
-    {
-        if (phrase1 != null) phrase1.gameObject.SetActive(false);
-        if (phrase2 != null) phrase2.gameObject.SetActive(false);
-        if (phrase3 != null) phrase3.gameObject.SetActive(false);
-        if (phrase4 != null) phrase4.gameObject.SetActive(false);
-
-        yield return new WaitForSeconds(0.5f);
-
-        // 🔥 Загружаем Level1 (там свой MusicController запустится)
-        SceneManager.LoadScene("Level1");
     }
 }
