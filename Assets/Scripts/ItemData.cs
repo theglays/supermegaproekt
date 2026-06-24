@@ -38,4 +38,8 @@ public string journalBlockName; // 🔥 НОВОЕ ПОЛЕ
 [Header("Диалог (для NPC)")]
 [Tooltip("Файл диалога (только для NPC)")]
 public DialogueData dialogue;
+  public DialogueTopic[] dialogueTopics;  // Массив тем диалога
+    
+    // 🔥 НОВОЕ: Флаг что это NPC с темами
+    public bool hasMultipleTopics = false;
 }

@@ -11,7 +11,7 @@ public class PauseMenu : MonoBehaviour
 
     void Start()
     {
-            DontDestroyOnLoad(gameObject);
+            // DontDestroyOnLoad(gameObject);
         // Убеждаемся, что панель паузы скрыта в начале
         if (pausePanel != null)
             pausePanel.SetActive(false);

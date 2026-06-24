@@ -56,12 +56,12 @@ public class DialogueSystem : MonoBehaviour
 
     currentDialogue = dialogue;
     currentLineIndex = 0;
-    onDialogueFinished = onFinish;
+    onDialogueFinished = onFinish;  // ← Используем старый callback
 
     if (dialoguePanel != null)
         dialoguePanel.SetActive(true);
 
-    // 🔥 СКРЫВАЕМ ПЛАШКУ ЗАДАЧ ПРИ НАЧАЛЕ ДИАЛОГА
+    // Скрываем плашку задач
     QuestUI questUI = FindObjectOfType<QuestUI>();
     if (questUI != null)
     {
@@ -199,7 +199,7 @@ public class DialogueSystem : MonoBehaviour
     /// <summary>
     /// Завершить диалог
     /// </summary>
-  void EndDialogue()
+ void EndDialogue()
 {
     if (dialoguePanel != null)
         dialoguePanel.SetActive(false);
@@ -207,14 +207,14 @@ public class DialogueSystem : MonoBehaviour
     currentDialogue = null;
     currentLineIndex = 0;
 
-    // Вызываем действие, если оно было передано
+    // 🔥 Вызываем ЕДИНСТВЕННЫЙ callback
     if (onDialogueFinished != null)
     {
         onDialogueFinished.Invoke();
         onDialogueFinished = null;
     }
 
-    //  ПОКАЗЫВАЕМ ПЛАШКУ ЗАДАЧ ПОСЛЕ ЗАВЕРШЕНИЯ ДИАЛОГА
+    // Показываем плашку задач
     QuestUI questUI = FindObjectOfType<QuestUI>();
     if (questUI != null && QuestManager.Instance != null)
     {
@@ -222,12 +222,10 @@ public class DialogueSystem : MonoBehaviour
         if (currentQuest != null)
         {
             questUI.UpdateQuestDisplay(currentQuest);
-            Debug.Log("[Dialogue] Плашка задач показана с новой задачей");
         }
         else
         {
             questUI.HideQuest();
-            Debug.Log("[Dialogue] Все задачи выполнены, плашка скрыта");
         }
     }
 

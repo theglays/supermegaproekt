@@ -138,65 +138,83 @@ if (interactable.data.journalEntryId == "door_exit")
     return; // 🔥 ВАЖНО: выходим из метода, чтобы не выполнялся остальной код
 }
         
-               // Проверяем, является ли это NPC с диалогом
-        if (interactable.data.isNpcEntry && interactable.data.dialogue != null)
+   // 🔥 Проверяем, является ли это NPC
+if (interactable.data.isNpcEntry)
+{
+    // 🔥 СНАЧАЛА: NPC с несколькими темами
+    if (interactable.data.hasMultipleTopics && 
+        interactable.data.dialogueTopics != null && 
+        interactable.data.dialogueTopics.Length > 0)
+    {
+        Debug.Log($"[Interaction] 🎭 NPC с темами! Показываем выбор...");
+        ShowTopicSelection(interactable);
+    }
+    // 🔥 ПОТОМ: обычный NPC с одним диалогом
+    else if (interactable.data.dialogue != null)
+    {
+        Debug.Log($"[Interaction] 💬 Обычный NPC, запускаем диалог");
+        
+        // Запускаем диалог и передаем действие, которое выполнится ПОСЛЕ его окончания
+        DialogueSystem.Instance.StartDialogue(interactable.data.dialogue, () => 
         {
-            // Запускаем диалог и передаем действие, которое выполнится ПОСЛЕ его окончания
-            DialogueSystem.Instance.StartDialogue(interactable.data.dialogue, () => 
-            {
-                // Помечаем NPC как завершившего диалог
-                interactable.MarkAsCompleted();
-                
-                // Завершаем квест (и запускаем 3-ю задачу) ТОЛЬКО сейчас
-                if (QuestManager.Instance != null)
-                {
-                    QuestManager.Instance.OnTargetInteracted(interactable.data.journalEntryId);
-                }
-                
-                // АКТИВИРУЕМ БЛОК В ДНЕВНИКЕ через массив прямых ссылок
-                if (!string.IsNullOrEmpty(interactable.data.journalBlockName))
-                {
-                    bool blockFound = false;
-                    
-                    if (journalBlocks != null)
-                    {
-                        foreach (GameObject block in journalBlocks)
-                        {
-                            if (block != null && block.name == interactable.data.journalBlockName)
-                            {
-                                block.SetActive(true);
-                                Debug.Log($"[Interaction] ✅ Активирован блок дневника: {interactable.data.journalBlockName}");
-                                blockFound = true;
-                                
-                                // 🔥 ПОКАЗЫВАЕМ УВЕДОМЛЕНИЕ О НОВОЙ ЗАПИСИ
-                                JournalUI journalUI = FindObjectOfType<JournalUI>();
-                                if (journalUI != null)
-                                {
-                                    journalUI.ShowNotification();
-                                }
-                                
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if (!blockFound)
-                    {
-                        Debug.LogWarning($"[Interaction] ❌ Блок дневника '{interactable.data.journalBlockName}' не найден в массиве journalBlocks!");
-                    }
-                }
-                
-                Debug.Log("[Interaction] Диалог окончен, квест обновлен.");
-            });
-        }
-        else
-        {
-            // Обычное взаимодействие с предметом
-            if (QuestManager.Instance != null && !string.IsNullOrEmpty(interactable.data.journalEntryId))
+            // Помечаем NPC как завершившего диалог
+            interactable.MarkAsCompleted();
+            
+            // Завершаем квест (и запускаем 3-ю задачу) ТОЛЬКО сейчас
+            if (QuestManager.Instance != null)
             {
                 QuestManager.Instance.OnTargetInteracted(interactable.data.journalEntryId);
             }
-        }
+            
+            // АКТИВИРУЕМ БЛОК В ДНЕВНИКЕ через массив прямых ссылок
+            if (!string.IsNullOrEmpty(interactable.data.journalBlockName))
+            {
+                bool blockFound = false;
+                
+                if (journalBlocks != null)
+                {
+                    foreach (GameObject block in journalBlocks)
+                    {
+                        if (block != null && block.name == interactable.data.journalBlockName)
+                        {
+                            block.SetActive(true);
+                            Debug.Log($"[Interaction] ✅ Активирован блок дневника: {interactable.data.journalBlockName}");
+                            blockFound = true;
+                            
+                            JournalUI journalUI = FindObjectOfType<JournalUI>();
+                            if (journalUI != null)
+                            {
+                                journalUI.ShowNotification();
+                            }
+                            
+                            break;
+                        }
+                    }
+                }
+                
+                if (!blockFound)
+                {
+                    Debug.LogWarning($"[Interaction] ❌ Блок дневника '{interactable.data.journalBlockName}' не найден в массиве journalBlocks!");
+                }
+            }
+            
+            Debug.Log("[Interaction] Диалог окончен, квест обновлен.");
+        });
+    }
+    // 🔥 ИНАЧЕ: NPC без диалога (ошибка)
+    else
+    {
+        Debug.LogError($"[Interaction] ❌ NPC '{interactable.data.itemName}' не имеет ни тем, ни диалога!");
+    }
+}
+else
+{
+    // Обычное взаимодействие с предметом
+    if (QuestManager.Instance != null && !string.IsNullOrEmpty(interactable.data.journalEntryId))
+    {
+        QuestManager.Instance.OnTargetInteracted(interactable.data.journalEntryId);
+    }
+}
     }
 }
 
@@ -313,4 +331,112 @@ void AddToJournal(ItemData data)
         Debug.LogWarning($"[Journal] ❌ Блок '{blockName}' не найден в массиве journalBlocks!");
     }
 }
+
+
+
+
+void HandleNPCInteraction(InteractableObject interactable)
+{
+    Debug.Log("[Interaction] HandleNPCInteraction() ВЫЗВАН");
+    
+    if (interactable.data == null)
+    {
+        Debug.LogError("[Interaction] ❌ data = NULL!");
+        return;
+    }
+
+    // 🔥 СНАЧАЛА проверяем темы
+    if (interactable.data.hasMultipleTopics && interactable.data.dialogueTopics != null && interactable.data.dialogueTopics.Length > 0)
+    {
+        Debug.Log("[Interaction] ✅ У NPC есть темы!");
+        // ... показываем темы
+    }
+    else if (interactable.data.dialogue != null)
+    {
+        Debug.Log("[Interaction] Обычный диалог");
+        // ... обычный диалог
+    }
+    else
+    {
+        Debug.LogError("[Interaction] ❌ Нет ни тем, ни диалога!");
+    }
+}
+
+void ShowTopicSelection(InteractableObject interactable)
+{
+    Debug.Log("========================================");
+    Debug.Log("[Interaction] ShowTopicSelection() ВЫЗВАН");
+    
+    if (TopicSelectionUI.Instance == null)
+    {
+        Debug.LogError("[Interaction] ❌ TopicSelectionUI.Instance = NULL!");
+        Debug.LogError("[Interaction] Создай объект с TopicSelectionUI в сцене!");
+        return;
+    }
+
+    Debug.Log($"[Interaction] ✅ TopicSelectionUI.Instance найден");
+    Debug.Log($"[Interaction] Тем: {interactable.data.dialogueTopics?.Length ?? 0}");
+
+    TopicSelectionUI.Instance.Show(interactable.data.dialogueTopics, (topicIndex) =>
+    {
+        Debug.Log($"[Interaction] Callback: выбрана тема #{topicIndex}");
+        StartTopicDialogue(interactable, topicIndex);
+    });
+    
+    Debug.Log("[Interaction] Show() вызван");
+    Debug.Log("========================================");
+}
+
+void StartTopicDialogue(InteractableObject interactable, int topicIndex)
+{
+    if (topicIndex < 0 || topicIndex >= interactable.data.dialogueTopics.Length) return;
+
+    DialogueTopic topic = interactable.data.dialogueTopics[topicIndex];
+    if (topic == null || topic.dialogue == null)
+    {
+        Debug.LogError($"[Interaction] Тема {topicIndex} или её диалог = NULL!");
+        return;
+    }
+
+    Debug.Log($"[Interaction] Начинаем диалог по теме: {topic.topicName}");
+
+    if (DialogueSystem.Instance != null)
+    {
+        DialogueSystem.Instance.StartDialogue(topic.dialogue, () =>
+        {
+            // Callback после завершения диалога
+            Debug.Log($"[Interaction] Диалог по теме '{topic.topicName}' завершён");
+            
+            // Помечаем тему как пройденную
+            topic.isCompleted = true;
+            
+            // Проверяем, все ли темы пройдены
+            bool allCompleted = true;
+            foreach (var t in interactable.data.dialogueTopics)
+            {
+                if (!t.isCompleted)
+                {
+                    allCompleted = false;
+                    break;
+                }
+            }
+
+            if (allCompleted)
+            {
+                Debug.Log("[Interaction] ✅ ВСЕ темы пройдены! Засчитываем задачу");
+                interactable.MarkAsCompleted();
+                if (QuestManager.Instance != null)
+                {
+                    QuestManager.Instance.OnTargetInteracted(interactable.data.journalEntryId);
+                }
+            }
+            else
+            {
+                Debug.Log("[Interaction] ⏳ Есть непройденные темы");
+            }
+        });
+    }
+}
+
+
 }

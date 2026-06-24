@@ -31,7 +31,7 @@ public class JournalUI : MonoBehaviour
 
     void Awake()
     {
-            DontDestroyOnLoad(gameObject);
+            // DontDestroyOnLoad(gameObject);
         // Инициализация панели дневника
         panelRect = journalPanel.GetComponent<RectTransform>();
         if (panelRect == null)

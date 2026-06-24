@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9281d6c8aa4cb2449b4cedece2afc15c, type: 3}
+  m_Name: Topic_2
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueTopic
+  topicName: "\u041E \u0434\u043E\u043C\u0435 \u0433\u0440\u0430\u0444\u0438\u043D\u0438"
+  topicDescription: 
+  dialogue: {fileID: 11400000, guid: 3be84fd8e5840ce46bb01d97c88d1335, type: 2}
+  isCompleted: 0
