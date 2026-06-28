@@ -42,7 +42,7 @@ public class AudioManager : MonoBehaviour
       if (Instance == null)
     {
         Instance = this;
-        DontDestroyOnLoad(gameObject); // 🔥 ЭТА СТРОКА
+        DontDestroyOnLoad(gameObject);
     }
     else
     {

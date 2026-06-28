@@ -159,7 +159,7 @@ void UpdateInteractableStates()
         }
         
         obj.SetInteractable(shouldBeActive);
-        Debug.Log($"[Quest] {obj.name} (ID: {objId}) установлен как interactable: {shouldBeActive}");
+        // Debug.Log($"[Quest] {obj.name} (ID: {objId}) установлен как interactable: {shouldBeActive}");
     }
     
     Debug.Log("[Quest] UpdateInteractableStates() завершена");

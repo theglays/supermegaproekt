@@ -28,6 +28,8 @@ MonoBehaviour:
   portraitSprite: {fileID: 0}
   isNpcEntry: 1
   journalBlockName: Entry_Block_4
-  dialogue: {fileID: 11400000, guid: eb7ca15adbf025a4eb608330b31b0d13, type: 2}
-  dialogueTopics: []
-  hasMultipleTopics: 0
+  dialogue: {fileID: 0}
+  dialogueTopics:
+  - {fileID: 11400000, guid: 8fd9ac08b0058b244beadbd682f725a7, type: 2}
+  - {fileID: 11400000, guid: e8dade3cc1562f1408825cd3a4630b75, type: 2}
+  hasMultipleTopics: 1

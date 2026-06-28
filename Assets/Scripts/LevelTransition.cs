@@ -13,23 +13,72 @@ public class LevelTransition : MonoBehaviour
     [Header("Настройки")]
     public float fadeDuration = 1.5f; // Длительность затемнения
 
-    void Awake()
-    {
-        // if (Instance == null)
-        // {
-        //     Instance = this;
-        // }
-        // else
-        // {
-        //     Destroy(gameObject);
-        // }
+    // void Awake()
+    // {
+    //     if (Instance == null)
+    //     {
+    //         Instance = this;
+    //         DontDestroyOnLoad(gameObject);
+    //     }
+    //     else
+    //     {
+    //         Destroy(gameObject);
+    //     }
 
-        // Настраиваем fadeImage
-        if (fadeImage != null)
+    //     // Настраиваем fadeImage
+    //     if (fadeImage != null)
+    //     {
+    //         fadeImage.color = new Color(0, 0, 0, 0);
+    //     }
+    // }
+void Awake()
+{
+    if (Instance == null)
+    {
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+    else
+    {
+        Destroy(gameObject);
+    }
+}
+
+// 🔥 ДОБАВЬ ЭТОТ МЕТОД
+void Start()
+{
+    // Если fadeImage не назначен — ищем автоматически
+    if (fadeImage == null)
+    {
+        Debug.LogWarning("[Transition] ⚠️ fadeImage не найден! Ищу автоматически...");
+        
+        // Ищем FadeImage в Canvas_Global
+        GameObject fadeObj = GameObject.Find("FadeImage");
+        if (fadeObj != null)
         {
-            fadeImage.color = new Color(0, 0, 0, 0);
+            fadeImage = fadeObj.GetComponent<Image>();
+            Debug.Log("[Transition] ✅ fadeImage найден автоматически!");
+        }
+        else
+        {
+            Debug.LogError("[Transition] ❌ FadeImage не найден нигде!");
         }
     }
+    else
+    {
+        Debug.Log("[Transition] ✅ fadeImage уже назначен!");
+    }
+    
+    if (fadeImage != null)
+        fadeImage.color = new Color(0, 0, 0, 0);
+}
+
+
+
+
+
+
+
 
     /// Плавное затемнение и переход на следующий уровень
 public void TransitionToLevel(string levelName)

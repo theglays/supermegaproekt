@@ -3,6 +3,9 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 using System.Collections;
+// using System.Reflection.PortableExecutable;
+// using System.Diagnostics;
+// using Debug = UnityEngine.Debug;
 
 public class DialogueSystem : MonoBehaviour
 {
@@ -30,6 +33,7 @@ public class DialogueSystem : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject); 
         }
         else
         {

@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+// using System.Diagnostics;
 
 public class InteractionSystem : MonoBehaviour
 {
@@ -52,36 +53,36 @@ void FindNearest()
     currentInteractable = null;
     float minDist = Mathf.Infinity;
 
-    Debug.Log($"[Interaction] Найдено объектов: {interactables.Length}");
+    // Debug.Log($"[Interaction] Найдено объектов: {interactables.Length}");
 
     foreach (InteractableObject obj in interactables)
     {
         // Проверяем, активен ли объект
         if (!obj.isInteractable)
         {
-            Debug.Log($"[Interaction] {obj.name} неактивен, пропускаем");
+            // Debug.Log($"[Interaction] {obj.name} неактивен, пропускаем");
             continue;
         }
         
         float dist = Vector3.Distance(transform.position, obj.transform.position);
-        Debug.Log($"[Interaction] {obj.name}: дистанция={dist:F2}, interactionDistance={interactionDistance}");
+        // Debug.Log($"[Interaction] {obj.name}: дистанция={dist:F2}, interactionDistance={interactionDistance}");
         
         if (dist < minDist && dist < interactionDistance)
         {
             minDist = dist;
             currentInteractable = obj.transform;
-            Debug.Log($"[Interaction] ✅ {obj.name} выбран как ближайший (дистанция: {dist:F2})");
+            // Debug.Log($"[Interaction] ✅ {obj.name} выбран как ближайший (дистанция: {dist:F2})");
         }
     }
     
-    if (currentInteractable != null)
-    {
-        Debug.Log($"[Interaction] Итоговый объект: {currentInteractable.name}");
-    }
-    else
-    {
-        Debug.Log("[Interaction] Итоговый объект: НЕТ");
-    }
+    // if (currentInteractable != null)
+    // {
+    //     // Debug.Log($"[Interaction] Итоговый объект: {currentInteractable.name}");
+    // }
+    // else
+    // {
+    //     // Debug.Log("[Interaction] Итоговый объект: НЕТ");
+    // }
 }
 
  void Interact()
@@ -148,7 +149,10 @@ if (interactable.data.isNpcEntry)
     {
         Debug.Log($"[Interaction] 🎭 NPC с темами! Показываем выбор...");
         ShowTopicSelection(interactable);
+        Debug.Log(interactable.data.dialogueTopics[0].topicName);
+        Debug.Break();
     }
+
     // 🔥 ПОТОМ: обычный NPC с одним диалогом
     else if (interactable.data.dialogue != null)
     {
